@@ -4,6 +4,7 @@ import { Play, Info, Star } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, MovieRow, RowSkeleton } from "@/components/MovieCard";
 import {
+  GENRES,
   getByGenre,
   getList,
   getTrending,
