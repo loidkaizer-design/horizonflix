@@ -29,24 +29,10 @@ export async function validateTicket(ticket: string): Promise<{ ok: boolean; mes
   const clean = ticket.trim();
   if (!clean) return { ok: false, message: "Please enter a ticket code." };
   try {
-    const res = await fetch(`https://tixy-ecru.vercel.app/api/ticket/${encodeURIComponent(clean)}`);
-    let data: Record<string, unknown> = {};
-    try {
-      data = await res.json();
-    } catch {
-      /* non-json response */
-    }
-    const invalidFlag =
-      data && (data["valid"] === false || data["success"] === false || data["error"]);
-    if (!res.ok || invalidFlag) {
-      const msg =
-        (typeof data["message"] === "string" && data["message"]) ||
-        (typeof data["error"] === "string" && data["error"]) ||
-        "That ticket is not valid.";
-      return { ok: false, message: msg };
-    }
-    return { ok: true };
+    const { checkTicket } = await import("./ticket.functions");
+    return await checkTicket({ data: { ticket: clean } });
   } catch {
     return { ok: false, message: "Couldn't reach the ticket service. Check your connection." };
   }
 }
+
