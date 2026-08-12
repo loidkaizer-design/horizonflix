@@ -42,21 +42,14 @@ export function Navigation() {
             <Logo className="h-9 sm:h-10" />
           </Link>
           <nav className="hidden items-center gap-5 text-sm md:flex">
-            {[
-              { to: "/home", label: "Home" },
-              { to: "/home", label: "Trending", hash: "trending" },
-            ].map((l, i) => (
-              <Link
-                key={i}
-                to={l.to}
-                hash={l.hash}
-                className={`relative py-1 transition-colors hover:text-accent ${
-                  pathname === l.to ? "text-foreground" : "text-muted-foreground"
-                } after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100`}
-              >
-                {l.label}
-              </Link>
-            ))}
+            <Link
+              to="/home"
+              className={`relative py-1 transition-colors hover:text-accent ${
+                pathname === "/home" ? "text-foreground" : "text-muted-foreground"
+              } after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100`}
+            >
+              Home
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-2">
