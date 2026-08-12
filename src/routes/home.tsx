@@ -42,11 +42,17 @@ function HomePage() {
   const { q } = Route.useSearch();
 
   const trending = useQuery({ queryKey: ["trending"], queryFn: getTrending, enabled: ready });
-  const action = useQuery({ queryKey: ["genre", 28], queryFn: () => getByGenre(28), enabled: ready });
-  const comedy = useQuery({ queryKey: ["genre", 35], queryFn: () => getByGenre(35), enabled: ready });
-  const scifi = useQuery({ queryKey: ["genre", 878], queryFn: () => getByGenre(878), enabled: ready });
-  const horror = useQuery({ queryKey: ["genre", 27], queryFn: () => getByGenre(27), enabled: ready });
+  const genreRows = useQueries({
+    queries: GENRES.map((g) => ({
+      queryKey: ["genre", g.id],
+      queryFn: () => getByGenre(g.id),
+      enabled: ready,
+    })),
+  });
   const top = useQuery({ queryKey: ["top_rated"], queryFn: () => getList("top_rated"), enabled: ready });
+  const popular = useQuery({ queryKey: ["popular"], queryFn: () => getList("popular"), enabled: ready });
+  const nowPlaying = useQuery({ queryKey: ["now_playing"], queryFn: () => getList("now_playing"), enabled: ready });
+  const upcoming = useQuery({ queryKey: ["upcoming"], queryFn: () => getList("upcoming"), enabled: ready });
   const results = useQuery({
     queryKey: ["search", q],
     queryFn: () => searchMovies(q!),
