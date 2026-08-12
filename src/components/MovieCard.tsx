@@ -44,7 +44,7 @@ export function MovieRow({ title, movies }: { title: string; movies: Movie[] }) 
     <section className="animate-fade mt-10">
       <h2 className="mb-4 px-4 text-lg font-bold sm:px-8 sm:text-xl">{title}</h2>
       <div className="no-scrollbar flex gap-4 overflow-x-auto px-4 pb-4 sm:px-8">
-        {movies.slice(0, 18).map((m, i) => (
+        {movies.slice(0, 40).map((m, i) => (
           <MovieCard key={m.id} movie={m} index={i} />
         ))}
       </div>
