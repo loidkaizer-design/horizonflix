@@ -145,11 +145,13 @@ function HomePage() {
           ) : (
             <MovieRow title="Trending Now" movies={trending.data ?? []} />
           )}
-          <MovieRow title="Action" movies={action.data ?? []} />
-          <MovieRow title="Comedy" movies={comedy.data ?? []} />
-          <MovieRow title="Sci-Fi" movies={scifi.data ?? []} />
-          <MovieRow title="Horror" movies={horror.data ?? []} />
+          <MovieRow title="Popular" movies={popular.data ?? []} />
+          <MovieRow title="Now Playing" movies={nowPlaying.data ?? []} />
           <MovieRow title="Top Rated" movies={top.data ?? []} />
+          <MovieRow title="Coming Soon" movies={upcoming.data ?? []} />
+          {GENRES.map((g, i) => (
+            <MovieRow key={g.id} title={g.name} movies={genreRows[i]?.data ?? []} />
+          ))}
           {trending.isError && (
             <p className="px-8 pt-10 text-sm text-destructive">
               Couldn't load the catalogue right now. Please refresh to try again.
