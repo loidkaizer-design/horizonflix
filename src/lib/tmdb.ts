@@ -29,14 +29,48 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
 export const getTrending = () =>
   tmdb<{ results: Movie[] }>("/trending/movie/week").then((d) => d.results);
 
+const dedupe = (movies: Movie[]) => {
+  const seen = new Set<number>();
+  return movies.filter((m) => (seen.has(m.id) ? false : (seen.add(m.id), true)));
+};
+
+const pages = async (loader: (page: number) => Promise<Movie[]>, count = 3) =>
+  dedupe((await Promise.all(Array.from({ length: count }, (_, i) => loader(i + 1)))).flat());
+
 export const getByGenre = (genreId: number) =>
-  tmdb<{ results: Movie[] }>("/discover/movie", {
-    with_genres: String(genreId),
-    sort_by: "popularity.desc",
-  }).then((d) => d.results);
+  pages((page) =>
+    tmdb<{ results: Movie[] }>("/discover/movie", {
+      with_genres: String(genreId),
+      sort_by: "popularity.desc",
+      page: String(page),
+    }).then((d) => d.results),
+  );
 
 export const getList = (list: string) =>
-  tmdb<{ results: Movie[] }>(`/movie/${list}`).then((d) => d.results);
+  pages((page) =>
+    tmdb<{ results: Movie[] }>(`/movie/${list}`, { page: String(page) }).then((d) => d.results),
+  );
+
+export const GENRES: { id: number; name: string }[] = [
+  { id: 28, name: "Action" },
+  { id: 12, name: "Adventure" },
+  { id: 16, name: "Animation" },
+  { id: 35, name: "Comedy" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentary" },
+  { id: 18, name: "Drama" },
+  { id: 10751, name: "Family" },
+  { id: 14, name: "Fantasy" },
+  { id: 36, name: "History" },
+  { id: 27, name: "Horror" },
+  { id: 10402, name: "Music" },
+  { id: 9648, name: "Mystery" },
+  { id: 10749, name: "Romance" },
+  { id: 878, name: "Sci-Fi" },
+  { id: 53, name: "Thriller" },
+  { id: 10752, name: "War" },
+  { id: 37, name: "Western" },
+];
 
 export const searchMovies = (query: string) =>
   tmdb<{ results: Movie[] }>("/search/movie", { query }).then((d) => d.results);
