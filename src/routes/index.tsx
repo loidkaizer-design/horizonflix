@@ -88,28 +88,45 @@ function TicketPage() {
             </p>
           </div>
 
-          <h1 className="mt-6 text-xl font-bold">Please process and validate your browser</h1>
+          <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1 text-xs text-muted-foreground">
+            {mobile ? <Smartphone className="h-3.5 w-3.5" /> : <Monitor className="h-3.5 w-3.5" />}
+            {mobile ? "Mobile device detected" : "Desktop device detected"}
+          </p>
+
+          <h1 className="mt-4 text-xl font-bold">Verify your device</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            To keep playback smooth and ad-free, install and enable an ad blocker before you
-            continue.
+            {mobile
+              ? "Set up uBlock DNS on your phone to block ads during playback. Finish the setup, follow the instructions, then come back here."
+              : "Install the Luna AdBlock extension for your browser. Finish the setup, follow the instructions, then come back here."}
           </p>
 
           <a
-            href="https://app.adblockluna.com/en"
+            href={
+              mobile
+                ? "https://ublockdns.com/"
+                : "https://chromewebstore.google.com/detail/luna-adblock-for-youtube/ehfcoplbhoohillcmlophcfghpeilfjc"
+            }
             target="_blank"
             rel="noopener noreferrer"
             className="gradient-violet group mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3.5 font-semibold text-primary-foreground transition-all duration-300 hover:brightness-110"
           >
             <ShieldCheck className="h-4 w-4" />
-            Luna AdBlocker
+            {mobile ? "Open uBlock DNS" : "Get Luna AdBlock"}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
 
           <button
             onClick={onContinue}
-            className="mt-3 w-full rounded-xl border border-border py-3 text-sm text-muted-foreground transition-all duration-300 hover:border-accent hover:text-accent"
+            disabled={checking}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm text-muted-foreground transition-all duration-300 hover:border-accent hover:text-accent disabled:opacity-60"
           >
-            Continue to HorizonFlix
+            {checking ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Testing…
+              </>
+            ) : (
+              "Done"
+            )}
           </button>
         </div>
       </main>
