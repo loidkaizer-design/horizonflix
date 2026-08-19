@@ -38,6 +38,7 @@ export const checkTicket = createServerFn({ method: "POST" })
         Boolean(body["error"]);
       if (!res.ok || invalid) {
         const msg =
+          (badStatus && `This ticket is ${status} and can no longer be used.`) ||
           (typeof body["message"] === "string" && body["message"]) ||
           (typeof body["error"] === "string" && body["error"]) ||
           "That ticket is not valid.";
