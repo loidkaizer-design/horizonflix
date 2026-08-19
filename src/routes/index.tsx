@@ -30,9 +30,12 @@ function TicketPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verified, setVerified] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [mobile, setMobile] = useState(false);
 
   useEffect(() => {
     if (getTicket()) navigate({ to: "/home" });
+    setMobile(isMobileDevice());
   }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
