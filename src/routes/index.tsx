@@ -48,7 +48,16 @@ function TicketPage() {
     }
   }
 
-  function onContinue() {
+  async function onContinue() {
+    setChecking(true);
+    setError(null);
+    const res = await validateTicket(ticket);
+    setChecking(false);
+    if (!res.ok) {
+      setVerified(false);
+      setError(res.message ?? "This ticket is no longer active.");
+      return;
+    }
     saveTicket(ticket.trim());
     navigate({ to: "/home" });
   }
