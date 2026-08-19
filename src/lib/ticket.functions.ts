@@ -16,8 +16,26 @@ export const checkTicket = createServerFn({ method: "POST" })
       } catch {
         /* non-json */
       }
+      const status = String(body["status"] ?? body["state"] ?? "").toLowerCase();
+      const badStatus = [
+        "inactive",
+        "expired",
+        "revoked",
+        "used",
+        "disabled",
+        "cancelled",
+        "canceled",
+        "suspended",
+      ].includes(status);
+      const activeFlag = body["active"];
+      // Strict: only an explicit positive signal grants access.
+      const explicitlyValid = body["valid"] === true || body["success"] === true;
       const invalid =
-        body["valid"] === false || body["success"] === false || Boolean(body["error"]);
+        !explicitlyValid ||
+        badStatus ||
+        activeFlag === false ||
+        body["expired"] === true ||
+        Boolean(body["error"]);
       if (!res.ok || invalid) {
         const msg =
           (typeof body["message"] === "string" && body["message"]) ||
