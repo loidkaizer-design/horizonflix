@@ -1,9 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Ticket, Loader2, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react";
+import {
+  Ticket,
+  Loader2,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  Smartphone,
+  Monitor,
+} from "lucide-react";
 
 import { Logo } from "@/components/Logo";
 import { getTicket, saveTicket, validateTicket } from "@/lib/ticket";
+import { isMobileDevice } from "@/lib/device";
 
 export const Route = createFileRoute("/")({
   head: () => ({
