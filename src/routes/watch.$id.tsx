@@ -47,12 +47,13 @@ function WatchPage() {
             Back to details
           </Link>
 
-          <div className="animate-fade glow overflow-hidden rounded-2xl border border-border bg-black">
-            <div className="aspect-video w-full">
+          <div className="animate-fade overflow-hidden rounded-2xl border border-primary/40 bg-[var(--gradient-violet)] p-px shadow-[var(--shadow-glow)]">
+            <div className="aspect-video w-full overflow-hidden rounded-[15px] bg-black">
               <iframe
                 key={reloadKey}
                 src={src}
-                title={movie.data ? titleOf(movie.data) : "Player"}
+                title={movie.data ? titleOf(movie.data) : "VidLink Player"}
+                allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="origin"
                 className="h-full w-full border-0"
@@ -61,7 +62,7 @@ function WatchPage() {
           </div>
 
           <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-            <span>Playback provided by an external source.</span>
+            <span>Playback provided by VidLink.</span>
             <button
               onClick={() => setReloadKey((k) => k + 1)}
               className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 transition-all duration-300 hover:border-accent hover:text-accent"
