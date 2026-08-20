@@ -58,8 +58,12 @@ export function CardSkeleton() {
 
 export function RowSkeleton() {
   return (
-    <div className="mt-10 px-4 sm:px-8">
-      <div className="shimmer mb-4 h-5 w-40 rounded" />
+    <div className="relative mt-10 px-4 sm:px-8">
+      <div className="pointer-events-none absolute -top-8 left-1/4 h-20 w-40 rounded-full bg-primary/15 blur-3xl animate-orb" />
+      <div className="mb-4 flex items-center gap-3">
+        <div className="shimmer h-5 w-40 rounded" />
+        <div className="gradient-loader h-1.5 w-16 rounded-full" />
+      </div>
       <div className="no-scrollbar flex gap-4 overflow-hidden">
         {Array.from({ length: 8 }).map((_, i) => (
           <CardSkeleton key={i} />
