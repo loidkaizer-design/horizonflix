@@ -69,11 +69,20 @@ function MoviePage() {
             <>
               <div className="mt-6 flex flex-col gap-8 md:flex-row">
                 {img(movie.poster_path, "w500") && (
-                  <img
-                    src={img(movie.poster_path, "w500")!}
-                    alt={titleOf(movie)}
-                    className="animate-rise w-52 shrink-0 self-start rounded-2xl shadow-[var(--shadow-card)] md:w-64"
-                  />
+                  <div className="flex w-52 shrink-0 flex-col gap-4 md:w-64">
+                    <img
+                      src={img(movie.poster_path, "w500")!}
+                      alt={titleOf(movie)}
+                      className="animate-rise w-full rounded-2xl shadow-[var(--shadow-card)]"
+                    />
+                    <Link
+                      to="/watch/$id"
+                      params={{ id: String(movie.id) }}
+                      className="gradient-violet glow inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 font-semibold text-primary-foreground transition-transform duration-300 hover:scale-105"
+                    >
+                      <Play className="h-4 w-4 fill-current" /> Watch now
+                    </Link>
+                  </div>
                 )}
                 <div className="animate-rise min-w-0" style={{ animationDelay: "80ms" }}>
                   <h1 className="text-3xl font-extrabold sm:text-5xl">{titleOf(movie)}</h1>
@@ -104,13 +113,6 @@ function MoviePage() {
                   <p className="mt-5 max-w-2xl leading-relaxed text-muted-foreground">
                     {movie.overview}
                   </p>
-                  <Link
-                    to="/watch/$id"
-                    params={{ id: String(movie.id) }}
-                    className="gradient-violet glow mt-7 inline-flex items-center gap-2 rounded-full px-7 py-3 font-semibold text-primary-foreground transition-transform duration-300 hover:scale-105"
-                  >
-                    <Play className="h-4 w-4 fill-current" /> Watch now
-                  </Link>
                 </div>
               </div>
 
