@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Play, Star, Clock, Calendar } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, RowSkeleton } from "@/components/MovieCard";
-import { getMovie, img, titleOf, year } from "@/lib/tmdb";
+import { getDivineTrailerUrl, getMovie, img, titleOf, year } from "@/lib/tmdb";
 
 export const Route = createFileRoute("/movie/$id")({
   head: () => ({
@@ -31,6 +31,12 @@ function MoviePage() {
     queryFn: () => getMovie(id),
     enabled: ready,
   });
+  const { data: trailerUrl } = useQuery({
+    queryKey: ["divine-trailer", id],
+    queryFn: () => getDivineTrailerUrl(id),
+    enabled: ready,
+    staleTime: 1000 * 60 * 30,
+  });
 
   if (!ready) return <div className="min-h-screen" />;
 
@@ -45,14 +51,16 @@ function MoviePage() {
               className="animate-fade h-full w-full object-cover opacity-25"
             />
           )}
-          {movie && (
+          {trailerUrl && (
             <div className="absolute inset-0 overflow-hidden">
               <iframe
-                src={`https://tmdbtrailor-dx8n9dfo.manus.space/trailer/tmdb/${movie.id}`}
-                title={`${titleOf(movie)} trailer background`}
-                allow="autoplay; encrypted-media"
-                referrerPolicy="no-referrer"
-                className="animate-trailer pointer-events-none absolute top-1/2 left-1/2 h-[180%] w-[180%] -translate-x-1/2 -translate-y-1/2 scale-110 opacity-45"
+                key={trailerUrl}
+                src={trailerUrl}
+                title="Trailer background"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                referrerPolicy="strict-origin-when-cross-origin"
+                aria-hidden="true"
+                className="animate-trailer pointer-events-none absolute top-1/2 left-1/2 h-[180%] w-[180%] -translate-x-1/2 -translate-y-1/2 scale-110 border-0 opacity-60"
               />
             </div>
           )}
