@@ -111,9 +111,24 @@ export type Person = {
 export const getPerson = (id: string | number) =>
   tmdb<Person>(`/person/${id}`, { append_to_response: "movie_credits" });
 
-export const playerUrl = (id: string | number) => `https://111movies.net/movie/${id}`;
+const VIDLINK_PARAMS = {
+  primaryColor: "7C3AED",
+  secondaryColor: "2E1065",
+  icons: "vid",
+  iconColor: "FFFFFF",
+  title: "true",
+  poster: "true",
+  autoplay: "false",
+};
+
+const vidlinkUrl = (path: string, extra: Record<string, string> = {}) => {
+  const params = new URLSearchParams({ ...VIDLINK_PARAMS, ...extra });
+  return `https://vidlink.pro${path}?${params.toString()}`;
+};
+
+export const playerUrl = (id: string | number) => vidlinkUrl(`/movie/${id}`);
 export const tvPlayerUrl = (id: string | number, season: number, episode: number) =>
-  `https://111movies.net/tv/${id}/${season}/${episode}`;
+  vidlinkUrl(`/tv/${id}/${season}/${episode}`, { nextbutton: "true" });
 
 export const year = (m: Movie) => (m.release_date || m.first_air_date || "").slice(0, 4);
 export const titleOf = (m: Movie) => m.title || m.name || "Untitled";
