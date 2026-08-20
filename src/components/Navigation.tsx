@@ -91,6 +91,7 @@ export function Attribution() {
       <p className="mt-2">
         Powered by <span className="font-semibold text-accent">Fantomistic</span>
       </p>
+      <p className="mt-3">All Rights reserved 2026 SkyPierce.</p>
     </footer>
   );
 }
