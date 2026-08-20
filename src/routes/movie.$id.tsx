@@ -37,14 +37,26 @@ function MoviePage() {
   return (
     <div className="min-h-screen">
       <div className="relative">
-        <div className="absolute inset-0 -z-10 h-[60vh]">
+        <div className="absolute inset-0 -z-10 h-[60vh] overflow-hidden bg-[image:var(--gradient-violet)]">
           {movie?.backdrop_path && (
             <img
               src={img(movie.backdrop_path, "original")!}
               alt=""
-              className="animate-fade h-full w-full object-cover opacity-40"
+              className="animate-fade h-full w-full object-cover opacity-25"
             />
           )}
+          {movie && (
+            <div className="absolute inset-0 overflow-hidden">
+              <iframe
+                src={`https://tmdbtrailor-dx8n9dfo.manus.space/trailer/tmdb/${movie.id}`}
+                title={`${titleOf(movie)} trailer background`}
+                allow="autoplay; encrypted-media"
+                referrerPolicy="no-referrer"
+                className="animate-trailer pointer-events-none absolute top-1/2 left-1/2 h-[180%] w-[180%] -translate-x-1/2 -translate-y-1/2 scale-110 opacity-45"
+              />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/55 to-background/10" />
           <div className="absolute inset-0 bg-[image:var(--gradient-fade)]" />
         </div>
         <Navigation />

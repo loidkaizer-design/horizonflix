@@ -1,10 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Star, RefreshCw, ArrowLeft } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, RowSkeleton } from "@/components/MovieCard";
 import { getMovie, getTrending, img, playerUrl, titleOf, year } from "@/lib/tmdb";
+
+type PlayerEventName = "play" | "pause" | "seeked" | "ended" | "timeupdate";
+
+type VidLinkPlayerEvent = {
+  type?: "PLAYER_EVENT";
+  data?: {
+    event?: PlayerEventName;
+    currentTime?: number;
+    duration?: number;
+  };
+};
 
 export const Route = createFileRoute("/watch/$id")({
   head: () => ({
@@ -25,6 +36,23 @@ function WatchPage() {
   const ready = useTicketGuard();
   const { id } = Route.useParams();
   const [reloadKey, setReloadKey] = useState(0);
+  const [playerEvent, setPlayerEvent] = useState<PlayerEventName | "ready">("ready");
+  const [playerProgress, setPlayerProgress] = useState(0);
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent<VidLinkPlayerEvent>) => {
+      if (event.origin !== "https://vidlink.pro" || event.data?.type !== "PLAYER_EVENT") return;
+      const data = event.data.data;
+      if (!data?.event) return;
+      setPlayerEvent(data.event);
+      if (typeof data.currentTime === "number" && typeof data.duration === "number" && data.duration > 0) {
+        setPlayerProgress(Math.min(100, Math.max(0, (data.currentTime / data.duration) * 100)));
+      }
+    };
+
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
 
   const movie = useQuery({ queryKey: ["movie", id], queryFn: () => getMovie(id), enabled: ready });
   const top = useQuery({ queryKey: ["trending"], queryFn: getTrending, enabled: ready });
@@ -61,14 +89,25 @@ function WatchPage() {
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-            <span>Playback provided by VidLink.</span>
-            <button
-              onClick={() => setReloadKey((k) => k + 1)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 transition-all duration-300 hover:border-accent hover:text-accent"
-            >
-              <RefreshCw className="h-3.5 w-3.5" /> Retry player
-            </button>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${playerEvent === "play" ? "animate-pulse bg-accent" : "bg-primary/70"}`} />
+              {playerEvent === "ready" ? "Ready to play" : `Player ${playerEvent}`}
+              {playerProgress > 0 && <span className="text-accent">{Math.round(playerProgress)}%</span>}
+            </span>
+            <span className="inline-flex items-center gap-3">
+              <span>Playback provided by VidLink.</span>
+              <button
+                onClick={() => {
+                  setPlayerEvent("ready");
+                  setPlayerProgress(0);
+                  setReloadKey((k) => k + 1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 transition-all duration-300 hover:border-accent hover:text-accent"
+              >
+                <RefreshCw className="h-3.5 w-3.5" /> Retry player
+              </button>
+            </span>
           </div>
 
           {movie.isLoading && <RowSkeleton />}

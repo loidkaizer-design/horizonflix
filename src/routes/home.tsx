@@ -8,6 +8,7 @@ import {
   getByGenre,
   getList,
   getTrending,
+  dedupeMovieGroups,
   img,
   searchMovies,
   titleOf,
@@ -60,6 +61,15 @@ function HomePage() {
   });
 
   const hero: Movie | undefined = trending.data?.[0];
+  const [uniqueTrending, uniquePopular, uniqueNowPlaying, uniqueTop, uniqueUpcoming, ...uniqueGenres] =
+    dedupeMovieGroups([
+      trending.data ?? [],
+      popular.data ?? [],
+      nowPlaying.data ?? [],
+      top.data ?? [],
+      upcoming.data ?? [],
+      ...genreRows.map((query) => query.data ?? []),
+    ]);
 
   if (!ready) return <div className="min-h-screen" />;
 
@@ -143,14 +153,14 @@ function HomePage() {
           {trending.isLoading ? (
             <RowSkeleton />
           ) : (
-            <MovieRow title="Trending Now" movies={trending.data ?? []} />
+            <MovieRow title="Trending Now" movies={uniqueTrending} />
           )}
-          <MovieRow title="Popular" movies={popular.data ?? []} />
-          <MovieRow title="Now Playing" movies={nowPlaying.data ?? []} />
-          <MovieRow title="Top Rated" movies={top.data ?? []} />
-          <MovieRow title="Coming Soon" movies={upcoming.data ?? []} />
+          <MovieRow title="Popular" movies={uniquePopular} />
+          <MovieRow title="Now Playing" movies={uniqueNowPlaying} />
+          <MovieRow title="Top Rated" movies={uniqueTop} />
+          <MovieRow title="Coming Soon" movies={uniqueUpcoming} />
           {GENRES.map((g, i) => (
-            <MovieRow key={g.id} title={g.name} movies={genreRows[i]?.data ?? []} />
+            <MovieRow key={g.id} title={g.name} movies={uniqueGenres[i] ?? []} />
           ))}
           {trending.isError && (
             <p className="px-8 pt-10 text-sm text-destructive">
