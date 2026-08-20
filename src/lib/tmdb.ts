@@ -130,5 +130,16 @@ export const playerUrl = (id: string | number) => vidlinkUrl(`/movie/${id}`);
 export const tvPlayerUrl = (id: string | number, season: number, episode: number) =>
   vidlinkUrl(`/tv/${id}/${season}/${episode}`, { nextbutton: "true" });
 
+export const dedupeMovieGroups = (groups: Movie[][]) => {
+  const seen = new Set<number>();
+  return groups.map((group) =>
+    group.filter((movie) => {
+      if (seen.has(movie.id)) return false;
+      seen.add(movie.id);
+      return true;
+    }),
+  );
+};
+
 export const year = (m: Movie) => (m.release_date || m.first_air_date || "").slice(0, 4);
 export const titleOf = (m: Movie) => m.title || m.name || "Untitled";
