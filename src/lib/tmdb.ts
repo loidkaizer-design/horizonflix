@@ -97,6 +97,30 @@ export const getMovie = (id: string | number) =>
     append_to_response: "credits,images,similar",
   });
 
+type DivineTrailerResponse = {
+  result?: {
+    data?: {
+      json?: {
+        trailerUrl?: string | null;
+      };
+    };
+  };
+};
+
+export const getDivineTrailerUrl = async (id: string | number): Promise<string | null> => {
+  const input = encodeURIComponent(JSON.stringify({ json: { id: Number(id) } }));
+  try {
+    const res = await fetch(
+      `https://divine-trailer-api.vercel.app/api/trpc/trailer.getForMovie?input=${input}`,
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as DivineTrailerResponse;
+    return data.result?.data?.json?.trailerUrl ?? null;
+  } catch {
+    return null;
+  }
+};
+
 export type Person = {
   id: number;
   name: string;
