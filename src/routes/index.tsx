@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
+import { Attribution } from "@/components/Navigation";
 import { getTicket, saveTicket, validateTicket } from "@/lib/ticket";
 import { isMobileDevice } from "@/lib/device";
 
@@ -76,7 +77,7 @@ function TicketPage() {
 
   if (verified) {
     return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+      <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10">
         <div className="animate-float absolute -top-40 -left-32 h-[26rem] w-[26rem] rounded-full bg-primary/25 blur-[120px]" />
         <div className="animate-pulse-glow absolute -right-24 -bottom-32 h-[24rem] w-[24rem] rounded-full bg-accent/20 blur-[130px]" />
 
@@ -129,13 +130,14 @@ function TicketPage() {
             )}
           </button>
         </div>
+        <Attribution />
       </main>
     );
   }
 
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10">
       <div className="animate-float absolute -top-40 -left-32 h-[26rem] w-[26rem] rounded-full bg-primary/25 blur-[120px]" />
       <div className="animate-pulse-glow absolute -right-24 -bottom-32 h-[24rem] w-[24rem] rounded-full bg-accent/20 blur-[130px]" />
 
@@ -191,6 +193,7 @@ function TicketPage() {
           Your ticket keeps you signed in on this device.
         </p>
       </div>
+      <Attribution />
     </main>
   );
 }
