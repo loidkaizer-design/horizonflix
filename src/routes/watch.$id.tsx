@@ -5,6 +5,7 @@ import { Star, RefreshCw, ArrowLeft } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, RowSkeleton } from "@/components/MovieCard";
 import { getMovie, getTrending, img, playerUrl, titleOf, year } from "@/lib/tmdb";
+import { recordWatch } from "@/lib/fandomhub";
 
 type PlayerEventName = "play" | "pause" | "seeked" | "ended" | "timeupdate";
 
@@ -45,7 +46,11 @@ function WatchPage() {
       const data = event.data.data;
       if (!data?.event) return;
       setPlayerEvent(data.event);
-      if (typeof data.currentTime === "number" && typeof data.duration === "number" && data.duration > 0) {
+      if (
+        typeof data.currentTime === "number" &&
+        typeof data.duration === "number" &&
+        data.duration > 0
+      ) {
         setPlayerProgress(Math.min(100, Math.max(0, (data.currentTime / data.duration) * 100)));
       }
     };
@@ -56,6 +61,18 @@ function WatchPage() {
 
   const movie = useQuery({ queryKey: ["movie", id], queryFn: () => getMovie(id), enabled: ready });
   const top = useQuery({ queryKey: ["trending"], queryFn: getTrending, enabled: ready });
+
+  useEffect(() => {
+    if (!ready || !movie.data) return;
+    const userId = localStorage.getItem("horizonflix-user-id");
+    if (userId)
+      void recordWatch({
+        userId,
+        tmdbId: Number(id),
+        watchedAt: new Date().toISOString(),
+        progress: 0,
+      }).catch(() => undefined);
+  }, [ready, movie.data, id]);
 
   if (!ready) return <div className="min-h-screen" />;
 
@@ -91,9 +108,13 @@ function WatchPage() {
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${playerEvent === "play" ? "animate-pulse bg-accent" : "bg-primary/70"}`} />
+              <span
+                className={`h-2 w-2 rounded-full ${playerEvent === "play" ? "animate-pulse bg-accent" : "bg-primary/70"}`}
+              />
               {playerEvent === "ready" ? "Ready to play" : `Player ${playerEvent}`}
-              {playerProgress > 0 && <span className="text-accent">{Math.round(playerProgress)}%</span>}
+              {playerProgress > 0 && (
+                <span className="text-accent">{Math.round(playerProgress)}%</span>
+              )}
             </span>
             <span className="inline-flex items-center gap-3">
               <span>Playback provided by VidLink.</span>

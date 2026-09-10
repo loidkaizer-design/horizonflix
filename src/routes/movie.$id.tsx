@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Play, Star, Clock, Calendar } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, RowSkeleton } from "@/components/MovieCard";
+import { MovieLogo } from "@/components/MovieLogo";
+import { Comments } from "@/components/Comments";
 import { getDivineTrailerUrl, getMovie, img, titleOf, year } from "@/lib/tmdb";
 
 export const Route = createFileRoute("/movie/$id")({
@@ -26,7 +28,11 @@ export const Route = createFileRoute("/movie/$id")({
 function MoviePage() {
   const ready = useTicketGuard();
   const { id } = Route.useParams();
-  const { data: movie, isLoading, isError } = useQuery({
+  const {
+    data: movie,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["movie", id],
     queryFn: () => getMovie(id),
     enabled: ready,
@@ -80,9 +86,7 @@ function MoviePage() {
 
           {isLoading && <RowSkeleton />}
           {isError && (
-            <p className="mt-10 text-destructive">
-              We couldn't load this title. Please try again.
-            </p>
+            <p className="mt-10 text-destructive">We couldn't load this title. Please try again.</p>
           )}
 
           {movie && (
@@ -105,7 +109,9 @@ function MoviePage() {
                   </div>
                 )}
                 <div className="animate-rise min-w-0" style={{ animationDelay: "80ms" }}>
-                  <h1 className="text-3xl font-extrabold sm:text-5xl">{titleOf(movie)}</h1>
+                  <h1 className="text-3xl font-extrabold sm:text-5xl">
+                    <MovieLogo movie={movie} className="max-h-32" />
+                  </h1>
                   {movie.tagline && (
                     <p className="mt-2 text-sm text-accent italic">{movie.tagline}</p>
                   )}
@@ -189,6 +195,8 @@ function MoviePage() {
                   </div>
                 </section>
               )}
+
+              <Comments tmdbId={movie.id} />
 
               {!!movie.similar?.results?.length && (
                 <section className="mt-12">

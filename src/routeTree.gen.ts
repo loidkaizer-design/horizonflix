@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as CastIdRouteImport } from './routes/cast.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
-import { Route as TicketMobileappaccess5y2RouteImport } from './routes/ticket.mobileappaccess5y2'
 import { Route as WatchIdRouteImport } from './routes/watch.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -26,6 +26,11 @@ const HomeRoute = HomeRouteImport.update({
   path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CastIdRoute = CastIdRouteImport.update({
   id: '/cast/$id',
   path: '/cast/$id',
@@ -36,12 +41,6 @@ const MovieIdRoute = MovieIdRouteImport.update({
   path: '/movie/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TicketMobileappaccess5y2Route =
-  TicketMobileappaccess5y2RouteImport.update({
-    id: '/ticket/mobileappaccess5y2',
-    path: '/ticket/mobileappaccess5y2',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const WatchIdRoute = WatchIdRouteImport.update({
   id: '/watch/$id',
   path: '/watch/$id',
@@ -51,61 +50,50 @@ const WatchIdRoute = WatchIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRoute
   '/cast/$id': typeof CastIdRoute
   '/movie/$id': typeof MovieIdRoute
-  '/ticket/mobileappaccess5y2': typeof TicketMobileappaccess5y2Route
   '/watch/$id': typeof WatchIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRoute
   '/cast/$id': typeof CastIdRoute
   '/movie/$id': typeof MovieIdRoute
-  '/ticket/mobileappaccess5y2': typeof TicketMobileappaccess5y2Route
   '/watch/$id': typeof WatchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRoute
   '/cast/$id': typeof CastIdRoute
   '/movie/$id': typeof MovieIdRoute
-  '/ticket/mobileappaccess5y2': typeof TicketMobileappaccess5y2Route
   '/watch/$id': typeof WatchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/home'
-    | '/cast/$id'
-    | '/movie/$id'
-    | '/ticket/mobileappaccess5y2'
-    | '/watch/$id'
+    '/' | '/home' | '/profile' | '/cast/$id' | '/movie/$id' | '/watch/$id'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/home'
-    | '/cast/$id'
-    | '/movie/$id'
-    | '/ticket/mobileappaccess5y2'
-    | '/watch/$id'
+  to: '/' | '/home' | '/profile' | '/cast/$id' | '/movie/$id' | '/watch/$id'
   id:
     | '__root__'
     | '/'
     | '/home'
+    | '/profile'
     | '/cast/$id'
     | '/movie/$id'
-    | '/ticket/mobileappaccess5y2'
     | '/watch/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
+  ProfileRoute: typeof ProfileRoute
   CastIdRoute: typeof CastIdRoute
   MovieIdRoute: typeof MovieIdRoute
-  TicketMobileappaccess5y2Route: typeof TicketMobileappaccess5y2Route
   WatchIdRoute: typeof WatchIdRoute
 }
 
@@ -125,6 +113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cast/$id': {
       id: '/cast/$id'
       path: '/cast/$id'
@@ -137,13 +132,6 @@ declare module '@tanstack/react-router' {
       path: '/movie/$id'
       fullPath: '/movie/$id'
       preLoaderRoute: typeof MovieIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ticket/mobileappaccess5y2': {
-      id: '/ticket/mobileappaccess5y2'
-      path: '/ticket/mobileappaccess5y2'
-      fullPath: '/ticket/mobileappaccess5y2'
-      preLoaderRoute: typeof TicketMobileappaccess5y2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/watch/$id': {
@@ -159,9 +147,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
+  ProfileRoute: ProfileRoute,
   CastIdRoute: CastIdRoute,
   MovieIdRoute: MovieIdRoute,
-  TicketMobileappaccess5y2Route: TicketMobileappaccess5y2Route,
   WatchIdRoute: WatchIdRoute,
 }
 export const routeTree = rootRouteImport
