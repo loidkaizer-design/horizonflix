@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as CastIdRouteImport } from './routes/cast.$id'
@@ -19,6 +20,11 @@ import { Route as WatchIdRouteImport } from './routes/watch.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeRoute = HomeRouteImport.update({
@@ -49,6 +55,7 @@ const WatchIdRoute = WatchIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRoute
   '/cast/$id': typeof CastIdRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRoute
   '/cast/$id': typeof CastIdRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRoute
   '/cast/$id': typeof CastIdRoute
@@ -75,12 +84,26 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/home' | '/profile' | '/cast/$id' | '/movie/$id' | '/watch/$id'
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/profile'
+    | '/cast/$id'
+    | '/movie/$id'
+    | '/watch/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/profile' | '/cast/$id' | '/movie/$id' | '/watch/$id'
+  to:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/profile'
+    | '/cast/$id'
+    | '/movie/$id'
+    | '/watch/$id'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/home'
     | '/profile'
     | '/cast/$id'
@@ -90,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   HomeRoute: typeof HomeRoute
   ProfileRoute: typeof ProfileRoute
   CastIdRoute: typeof CastIdRoute
@@ -104,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -146,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   HomeRoute: HomeRoute,
   ProfileRoute: ProfileRoute,
   CastIdRoute: CastIdRoute,
