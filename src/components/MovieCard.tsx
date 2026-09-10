@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { img, titleOf, year, type Movie } from "@/lib/tmdb";
+import { MovieLogo } from "@/components/MovieLogo";
 
 export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }) {
   const poster = img(movie.poster_path, "w500");
@@ -31,7 +32,7 @@ export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }
         </div>
       </div>
       <p className="mt-2 truncate text-sm font-semibold transition-colors group-hover:text-accent">
-        {titleOf(movie)}
+        <MovieLogo movie={movie} />
       </p>
       <p className="text-xs text-muted-foreground">{year(movie) || "—"}</p>
     </Link>

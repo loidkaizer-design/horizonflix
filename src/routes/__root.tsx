@@ -80,13 +80,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "HorizonFlix — Premium Movie Streaming" },
       {
         name: "description",
-        content: "Ticket-based access to trending movies, cast profiles and instant playback.",
+        content: "Browse trending movies, connect with fans, and start watching instantly.",
       },
       { name: "author", content: "Fantomistic" },
       { property: "og:title", content: "HorizonFlix — Premium Movie Streaming" },
       {
         property: "og:description",
-        content: "Ticket-based access to trending movies, cast profiles and instant playback.",
+        content: "Browse trending movies, connect with fans, and start watching instantly.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

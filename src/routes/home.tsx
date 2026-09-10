@@ -3,6 +3,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { Play, Info, Star } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, MovieRow, RowSkeleton } from "@/components/MovieCard";
+import { MovieLogo } from "@/components/MovieLogo";
 import {
   GENRES,
   getByGenre,
@@ -26,7 +27,8 @@ export const Route = createFileRoute("/home")({
       { title: "Browse Movies — HorizonFlix" },
       {
         name: "description",
-        content: "Trending, action, comedy and top rated movies, streaming instantly on HorizonFlix.",
+        content:
+          "Trending, action, comedy and top rated movies, streaming instantly on HorizonFlix.",
       },
       { property: "og:title", content: "Browse Movies — HorizonFlix" },
       {
@@ -50,10 +52,26 @@ function HomePage() {
       enabled: ready,
     })),
   });
-  const top = useQuery({ queryKey: ["top_rated"], queryFn: () => getList("top_rated"), enabled: ready });
-  const popular = useQuery({ queryKey: ["popular"], queryFn: () => getList("popular"), enabled: ready });
-  const nowPlaying = useQuery({ queryKey: ["now_playing"], queryFn: () => getList("now_playing"), enabled: ready });
-  const upcoming = useQuery({ queryKey: ["upcoming"], queryFn: () => getList("upcoming"), enabled: ready });
+  const top = useQuery({
+    queryKey: ["top_rated"],
+    queryFn: () => getList("top_rated"),
+    enabled: ready,
+  });
+  const popular = useQuery({
+    queryKey: ["popular"],
+    queryFn: () => getList("popular"),
+    enabled: ready,
+  });
+  const nowPlaying = useQuery({
+    queryKey: ["now_playing"],
+    queryFn: () => getList("now_playing"),
+    enabled: ready,
+  });
+  const upcoming = useQuery({
+    queryKey: ["upcoming"],
+    queryFn: () => getList("upcoming"),
+    enabled: ready,
+  });
   const results = useQuery({
     queryKey: ["search", q],
     queryFn: () => searchMovies(q!),
@@ -61,15 +79,21 @@ function HomePage() {
   });
 
   const hero: Movie | undefined = trending.data?.[0];
-  const [uniqueTrending, uniquePopular, uniqueNowPlaying, uniqueTop, uniqueUpcoming, ...uniqueGenres] =
-    dedupeMovieGroups([
-      trending.data ?? [],
-      popular.data ?? [],
-      nowPlaying.data ?? [],
-      top.data ?? [],
-      upcoming.data ?? [],
-      ...genreRows.map((query) => query.data ?? []),
-    ]);
+  const [
+    uniqueTrending,
+    uniquePopular,
+    uniqueNowPlaying,
+    uniqueTop,
+    uniqueUpcoming,
+    ...uniqueGenres
+  ] = dedupeMovieGroups([
+    trending.data ?? [],
+    popular.data ?? [],
+    nowPlaying.data ?? [],
+    top.data ?? [],
+    upcoming.data ?? [],
+    ...genreRows.map((query) => query.data ?? []),
+  ]);
 
   if (!ready) return <div className="min-h-screen" />;
 
@@ -91,9 +115,7 @@ function HomePage() {
 
         {q ? (
           <section className="px-4 pt-10 sm:px-8">
-            <h1 className="animate-rise text-2xl font-bold sm:text-3xl">
-              Results for “{q}”
-            </h1>
+            <h1 className="animate-rise text-2xl font-bold sm:text-3xl">Results for “{q}”</h1>
             {results.isLoading ? (
               <RowSkeleton />
             ) : results.data?.length ? (
@@ -114,7 +136,7 @@ function HomePage() {
                   #1 Trending this week
                 </span>
                 <h1 className="mt-4 text-4xl leading-tight font-extrabold sm:text-6xl">
-                  {titleOf(hero)}
+                  <MovieLogo movie={hero} className="max-h-36" />
                 </h1>
                 <div className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">
                   <span className="inline-flex items-center gap-1 text-accent">

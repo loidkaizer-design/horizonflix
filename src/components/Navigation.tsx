@@ -1,20 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, LogOut } from "lucide-react";
+import { Search, UserRound } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { clearTicket, getTicket } from "@/lib/ticket";
 
 export function useTicketGuard() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (!getTicket()) {
-      navigate({ to: "/" });
-    } else {
-      setReady(true);
-    }
-  }, [navigate]);
-  return ready;
+  return true;
 }
 
 export function Navigation() {
@@ -68,16 +58,13 @@ export function Navigation() {
               className="w-36 rounded-full border border-border bg-secondary/60 py-2 pr-3 pl-9 text-sm outline-none transition-all duration-500 focus:w-52 focus:border-accent focus:bg-secondary sm:w-48 sm:focus:w-72"
             />
           </form>
-          <button
-            aria-label="Sign out"
-            onClick={() => {
-              clearTicket();
-              navigate({ to: "/" });
-            }}
+          <Link
+            to="/profile"
+            aria-label="Open profile"
             className="rounded-full border border-border p-2 text-muted-foreground transition-all duration-300 hover:scale-110 hover:border-accent hover:text-accent"
           >
-            <LogOut className="h-4 w-4" />
-          </button>
+            <UserRound className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </header>

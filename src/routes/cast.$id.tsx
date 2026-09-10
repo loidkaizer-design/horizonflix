@@ -20,7 +20,11 @@ export const Route = createFileRoute("/cast/$id")({
 function CastPage() {
   const ready = useTicketGuard();
   const { id } = Route.useParams();
-  const { data: person, isLoading, isError } = useQuery({
+  const {
+    data: person,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["person", id],
     queryFn: () => getPerson(id),
     enabled: ready,

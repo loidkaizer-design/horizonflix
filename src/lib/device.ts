@@ -16,7 +16,8 @@ export function isWebView(): boolean {
     "ReactNativeWebView" in window ||
     "flutter_inappwebview" in window ||
     ("webkit" in window &&
-      Boolean((window as unknown as { webkit?: { messageHandlers?: unknown } }).webkit
-        ?.messageHandlers));
+      Boolean(
+        (window as unknown as { webkit?: { messageHandlers?: unknown } }).webkit?.messageHandlers,
+      ));
   return isAndroidWebView || isIOSWebView || hasNativeBridge;
 }
