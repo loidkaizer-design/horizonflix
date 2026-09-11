@@ -76,13 +76,55 @@ export function Navigation() {
               className="w-36 rounded-full border border-border bg-secondary/60 py-2 pr-3 pl-9 text-sm outline-none transition-all duration-500 focus:w-52 focus:border-accent focus:bg-secondary sm:w-48 sm:focus:w-72"
             />
           </form>
-          <Link
-            to="/profile"
-            aria-label="Open profile"
-            className="rounded-full border border-border p-2 text-muted-foreground transition-all duration-300 hover:scale-110 hover:border-accent hover:text-accent"
-          >
-            <UserRound className="h-4 w-4" />
-          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/watchlist"
+                aria-label="Open watchlist"
+                className={`rounded-full border p-2 transition-all duration-300 hover:scale-110 hover:border-accent hover:text-accent ${
+                  pathname === "/watchlist"
+                    ? "border-accent text-accent"
+                    : "border-border text-muted-foreground"
+                }`}
+              >
+                <Bookmark className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/profile"
+                aria-label="Open profile"
+                className="flex items-center gap-2 rounded-full border border-border py-1 pr-3 pl-1 text-sm transition-all duration-300 hover:border-accent hover:text-accent"
+              >
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt=""
+                    className="h-7 w-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary">
+                    <UserRound className="h-4 w-4" />
+                  </span>
+                )}
+                <span className="hidden max-w-24 truncate sm:block">
+                  {profile?.display_name ?? "Profile"}
+                </span>
+              </Link>
+              <button
+                onClick={signOut}
+                aria-label="Sign out"
+                className="rounded-full border border-border p-2 text-muted-foreground transition-all duration-300 hover:scale-110 hover:border-destructive hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="gradient-violet rounded-full px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform duration-300 hover:scale-105"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </header>
