@@ -1,179 +1,171 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Save } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { Attribution, Navigation } from "@/components/Navigation";
-import {
-  createProfile,
-  generateUserId,
-  getAvatars,
-  getProfile,
-  getWatchHistory,
-  updateProfile,
-  type Avatar,
-  type Profile,
-} from "@/lib/fandomhub";
+import { useAuth } from "@/hooks/useAuth";
+import { fetchProfile, fetchWatchlist, saveProfile } from "@/lib/account";
+import { img } from "@/lib/tmdb";
 
-export const Route = createFileRoute("/profile")({ component: ProfilePage });
-const USER_KEY = "horizonflix-user-id";
-const fallback: Profile = {
-  userId: "",
-  displayName: "Movie lover",
-  username: "movie-lover",
-  description: "Here for the stories.",
-  profilePicture: "",
-};
+export const Route = createFileRoute("/profile")({
+  head: () => ({
+    meta: [
+      { title: "Your Profile — HorizonFlix" },
+      {
+        name: "description",
+        content: "Update your HorizonFlix display name and avatar, and review your saved titles.",
+      },
+      { property: "og:title", content: "Your Profile — HorizonFlix" },
+      {
+        property: "og:description",
+        content: "Manage your HorizonFlix account details and saved movies.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: ProfilePage,
+});
+
+const AVATARS = Array.from(
+  { length: 24 },
+  (_, i) => `https://api.dicebear.com/9.x/adventurer/svg?seed=horizonflix-${i + 1}`,
+);
 
 function ProfilePage() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const client = useQueryClient();
-  const [profile, setProfile] = useState<Profile>(fallback);
-  const [userId, setUserId] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
   useEffect(() => {
-    let id = localStorage.getItem(USER_KEY);
-    const setup = async () => {
-      if (!id) {
-        const result = await generateUserId();
-        id = result.userId ?? result.id ?? `hrfx${Math.floor(Math.random() * 900000 + 100000)}`;
-        localStorage.setItem(USER_KEY, id);
-      }
-      setUserId(id);
-      try {
-        const existing = await getProfile(id);
-        setProfile(existing);
-      } catch {
-        const initial = { ...fallback, userId: id };
-        setProfile(initial);
-        await createProfile(initial).catch(() => undefined);
-      }
-    };
-    void setup();
-  }, []);
-  const avatars = useQuery({ queryKey: ["avatars"], queryFn: getAvatars });
-  const history = useQuery({
-    queryKey: ["watch-history", userId],
-    queryFn: () => getWatchHistory(userId),
-    enabled: Boolean(userId),
+    if (!loading && !user) navigate({ to: "/auth" });
+  }, [loading, user, navigate]);
+
+  const profile = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: () => fetchProfile(user!.id),
+    enabled: Boolean(user),
   });
+
+  useEffect(() => {
+    if (profile.data) {
+      setDisplayName(profile.data.display_name ?? "");
+      setAvatarUrl(profile.data.avatar_url ?? null);
+    }
+  }, [profile.data]);
+
+  const watchlist = useQuery({
+    queryKey: ["watchlist", user?.id],
+    queryFn: fetchWatchlist,
+    enabled: Boolean(user),
+  });
+
   const save = useMutation({
-    mutationFn: () => updateProfile(profile),
-    onSuccess: (saved) => {
-      setProfile(saved);
-      client.invalidateQueries({ queryKey: ["profile", userId] });
-    },
+    mutationFn: () =>
+      saveProfile(user!.id, { display_name: displayName.trim() || "Viewer", avatar_url: avatarUrl }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["profile", user?.id] }),
   });
+
+  const saved = watchlist.data ?? [];
+
   return (
     <div className="min-h-screen">
       <Navigation />
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-8">
         <Link
           to="/home"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-accent"
         >
           <ArrowLeft className="h-4 w-4" /> Back to browse
         </Link>
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_280px]">
-          <section className="glass rounded-3xl p-6 sm:p-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">
-                  Your profile
-                </p>
-                <h1 className="mt-2 text-3xl font-extrabold">Make it yours.</h1>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Your User ID is permanent and powers your watch history.
-                </p>
-              </div>
-              <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-xs text-accent">
-                {userId || "Generating..."}
-              </span>
-            </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">
-                Display name
-                <input
-                  value={profile.displayName}
-                  onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
-                  className="mt-2 w-full rounded-xl border border-border bg-secondary/60 px-4 py-3 font-normal outline-none focus:border-accent"
-                />
-              </label>
-              <label className="text-sm font-semibold">
-                Username
-                <input
-                  value={profile.username}
-                  onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                  className="mt-2 w-full rounded-xl border border-border bg-secondary/60 px-4 py-3 font-normal outline-none focus:border-accent"
-                />
-              </label>
-              <label className="text-sm font-semibold sm:col-span-2">
-                Description
-                <textarea
-                  value={profile.description}
-                  onChange={(e) => setProfile({ ...profile, description: e.target.value })}
-                  rows={3}
-                  className="mt-2 w-full resize-none rounded-xl border border-border bg-secondary/60 px-4 py-3 font-normal outline-none focus:border-accent"
-                />
-              </label>
-            </div>
-            <button
-              onClick={() => save.mutate()}
-              disabled={save.isPending || !userId}
-              className="gradient-violet mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold text-primary-foreground disabled:opacity-50"
-            >
-              <Save className="h-4 w-4" /> Save profile
-            </button>
-            <div className="mt-10">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_300px]">
+          <section className="glass animate-rise rounded-3xl p-6 sm:p-8">
+            <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">Your profile</p>
+            <h1 className="mt-2 text-3xl font-extrabold">Make it yours.</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your name and avatar appear next to the comments you post.
+            </p>
+
+            <label className="mt-8 block text-sm font-semibold">
+              Display name
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Viewer"
+                className="mt-2 w-full rounded-xl border border-border bg-secondary/60 px-4 py-3 font-normal outline-none transition-colors focus:border-accent"
+              />
+            </label>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Signed in as <span className="text-foreground">{user?.email}</span>
+            </p>
+
+            <div className="mt-8">
               <h2 className="text-lg font-bold">Choose an avatar</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                35 built-in choices: 15 male, 15 female, and 5 random.
-              </p>
-              <div className="mt-4 grid grid-cols-5 gap-3 sm:grid-cols-7">
-                {(avatars.data ?? []).map((avatar: Avatar) => (
+              <div className="mt-4 grid grid-cols-5 gap-3 sm:grid-cols-8">
+                {AVATARS.map((url) => (
                   <button
-                    key={avatar.id}
+                    key={url}
                     type="button"
-                    onClick={() => setProfile({ ...profile, profilePicture: avatar.url })}
-                    className={`overflow-hidden rounded-2xl border-2 transition-transform hover:scale-105 ${profile.profilePicture === avatar.url ? "border-accent" : "border-transparent"}`}
+                    onClick={() => setAvatarUrl(url)}
+                    className={`overflow-hidden rounded-2xl border-2 bg-secondary/60 transition-transform duration-300 hover:scale-110 ${
+                      avatarUrl === url ? "border-accent" : "border-transparent"
+                    }`}
                   >
-                    <img
-                      src={avatar.url}
-                      alt={avatar.name ?? `Avatar ${avatar.id}`}
-                      className="aspect-square w-full object-cover"
-                    />
+                    <img src={url} alt="Avatar option" className="aspect-square w-full" />
                   </button>
                 ))}
               </div>
             </div>
+
+            <button
+              onClick={() => save.mutate()}
+              disabled={save.isPending || !user}
+              className="gradient-violet mt-8 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold text-primary-foreground transition-transform duration-300 hover:scale-105 disabled:opacity-50"
+            >
+              <Save className="h-4 w-4" /> {save.isPending ? "Saving..." : "Save profile"}
+            </button>
+            {save.isSuccess && <p className="mt-3 text-sm text-accent">Profile saved.</p>}
+            {save.isError && (
+              <p className="mt-3 text-sm text-destructive">We couldn't save that. Try again.</p>
+            )}
           </section>
-          <aside className="glass h-fit rounded-3xl p-6">
-            <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">
-              Watch history
-            </p>
-            <h2 className="mt-2 text-2xl font-extrabold">Your journey</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Movies you watch are attached to your immutable User ID.
-            </p>
+
+          <aside className="glass animate-rise h-fit rounded-3xl p-6" style={{ animationDelay: "80ms" }}>
+            <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">Watchlist</p>
+            <h2 className="mt-2 text-2xl font-extrabold">Saved titles</h2>
             <div className="mt-6 flex flex-col gap-3">
-              {history.isLoading && (
-                <p className="text-sm text-muted-foreground">Loading history...</p>
-              )}
-              {!history.isLoading && !history.data?.length && (
+              {!saved.length && (
                 <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                  Start watching to build your history.
+                  Nothing saved yet.
                 </p>
               )}
-              {history.data?.map((entry) => (
-                <div
-                  key={entry.id ?? entry.tmdbId}
-                  className="rounded-xl bg-secondary/60 px-3 py-2 text-sm"
+              {saved.slice(0, 8).map((entry) => (
+                <Link
+                  key={entry.id}
+                  to="/movie/$id"
+                  params={{ id: String(entry.movie_id) }}
+                  className="flex items-center gap-3 rounded-xl bg-secondary/60 p-2 text-sm transition-colors hover:text-accent"
                 >
-                  Movie #{entry.tmdbId}
-                  <span className="block text-xs text-muted-foreground">
-                    {new Date(entry.watchedAt).toLocaleDateString()}
-                  </span>
-                </div>
+                  {img(entry.poster_path, "w500") && (
+                    <img
+                      src={img(entry.poster_path, "w500")!}
+                      alt=""
+                      loading="lazy"
+                      className="h-14 w-10 shrink-0 rounded-md object-cover"
+                    />
+                  )}
+                  <span className="truncate">{entry.title ?? `Movie #${entry.movie_id}`}</span>
+                </Link>
               ))}
             </div>
+            <Link
+              to="/watchlist"
+              className="mt-5 inline-flex text-sm text-accent hover:underline"
+            >
+              View full watchlist
+            </Link>
           </aside>
         </div>
       </main>

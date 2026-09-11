@@ -5,6 +5,7 @@ import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation
 import { MovieCard, RowSkeleton } from "@/components/MovieCard";
 import { MovieLogo } from "@/components/MovieLogo";
 import { Comments } from "@/components/Comments";
+import { WatchlistButton } from "@/components/WatchlistButton";
 import { getDivineTrailerUrl, getMovie, img, titleOf, year } from "@/lib/tmdb";
 
 export const Route = createFileRoute("/movie/$id")({
@@ -106,6 +107,11 @@ function MoviePage() {
                     >
                       <Play className="h-4 w-4 fill-current" /> Watch now
                     </Link>
+                    <WatchlistButton
+                      movieId={movie.id}
+                      title={titleOf(movie)}
+                      posterPath={movie.poster_path}
+                    />
                   </div>
                 )}
                 <div className="animate-rise min-w-0" style={{ animationDelay: "80ms" }}>

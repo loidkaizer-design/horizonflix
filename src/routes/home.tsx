@@ -175,12 +175,12 @@ function HomePage() {
           {trending.isLoading ? (
             <RowSkeleton />
           ) : (
-            <MovieRow title="Trending Now" movies={uniqueTrending} />
+            <MovieRow title="Trending Now" movies={uniqueTrending ?? []} />
           )}
-          <MovieRow title="Popular" movies={uniquePopular} />
-          <MovieRow title="Now Playing" movies={uniqueNowPlaying} />
-          <MovieRow title="Top Rated" movies={uniqueTop} />
-          <MovieRow title="Coming Soon" movies={uniqueUpcoming} />
+          <MovieRow title="Popular" movies={uniquePopular ?? []} />
+          <MovieRow title="Now Playing" movies={uniqueNowPlaying ?? []} />
+          <MovieRow title="Top Rated" movies={uniqueTop ?? []} />
+          <MovieRow title="Coming Soon" movies={uniqueUpcoming ?? []} />
           {GENRES.map((g, i) => (
             <MovieRow key={g.id} title={g.name} movies={uniqueGenres[i] ?? []} />
           ))}

@@ -52,7 +52,7 @@ export const getMovieLogos = async (tmdbId: number | string) => {
   if (Array.isArray(data)) return data as MovieLogo[];
   if (data && typeof data === "object") {
     const record = data as Record<string, unknown>;
-    const variants = record.logos ?? record.variants ?? record.data;
+    const variants = record['logos'] ?? record['variants'] ?? record['data'];
     if (Array.isArray(variants)) return variants as MovieLogo[];
   }
   return [];
