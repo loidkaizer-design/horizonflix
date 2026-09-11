@@ -114,8 +114,6 @@ function MoviePage() {
                     />
                   </div>
                 )}
-                  </div>
-                )}
                 <div className="animate-rise min-w-0" style={{ animationDelay: "80ms" }}>
                   <h1 className="text-3xl font-extrabold sm:text-5xl">
                     <MovieLogo movie={movie} className="max-h-32" />
