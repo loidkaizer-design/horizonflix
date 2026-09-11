@@ -29,7 +29,13 @@ export function WatchlistButton({
     mutationFn: async () => {
       if (!user) return;
       if (saved) await removeFromWatchlist(movieId);
-      else await addToWatchlist({ userId: user.id, movieId, title, posterPath });
+        else
+          await addToWatchlist({
+            userId: user.id,
+            movieId,
+            title: title ?? null,
+            posterPath: posterPath ?? null,
+          });
     },
     onSuccess: () => client.invalidateQueries({ queryKey: ["watchlist", user?.id] }),
   });
