@@ -1,7 +1,11 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, UserRound } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Bookmark, LogOut, Search, UserRound } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { useAuth } from "@/hooks/useAuth";
+import { fetchProfile } from "@/lib/account";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useTicketGuard() {
   return true;
