@@ -16,6 +16,20 @@ export function Navigation() {
   const [q, setQ] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user } = useAuth();
+  const client = useQueryClient();
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: () => fetchProfile(user!.id),
+    enabled: Boolean(user),
+  });
+
+  async function signOut() {
+    await client.cancelQueries();
+    client.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
