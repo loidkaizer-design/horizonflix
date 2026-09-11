@@ -107,6 +107,13 @@ function MoviePage() {
                     >
                       <Play className="h-4 w-4 fill-current" /> Watch now
                     </Link>
+                    <WatchlistButton
+                      movieId={movie.id}
+                      title={titleOf(movie)}
+                      posterPath={movie.poster_path}
+                    />
+                  </div>
+                )}
                   </div>
                 )}
                 <div className="animate-rise min-w-0" style={{ animationDelay: "80ms" }}>
