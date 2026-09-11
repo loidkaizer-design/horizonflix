@@ -5,6 +5,7 @@ import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation
 import { MovieCard, RowSkeleton } from "@/components/MovieCard";
 import { MovieLogo } from "@/components/MovieLogo";
 import { Comments } from "@/components/Comments";
+import { WatchlistButton } from "@/components/WatchlistButton";
 import { getDivineTrailerUrl, getMovie, img, titleOf, year } from "@/lib/tmdb";
 
 export const Route = createFileRoute("/movie/$id")({
