@@ -5,8 +5,41 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { loadEnv, type Connect, type Plugin } from "vite";
+
+function tmdbProxy(): Plugin {
+  let token = "";
+  const handler: Connect.NextHandleFunction = async (req, res, next) => {
+    if (!req.url?.startsWith("/api/tmdb")) return next();
+    if (!token) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: "TMDB is not configured" }));
+      return;
+    }
+    const target = new URL(`https://api.themoviedb.org/3${req.url.replace(/^\/api\/tmdb/, "")}`);
+    const upstream = await fetch(target, {
+      headers: { Authorization: `Bearer ${token}`, accept: "application/json" },
+    });
+    res.statusCode = upstream.status;
+    res.setHeader("content-type", "application/json");
+    res.end(await upstream.text());
+  };
+  return {
+    name: "tmdb-server-proxy",
+    config(_, env) {
+      token = loadEnv(env.mode, process.cwd(), "").TMDB_API_TOKEN ?? "";
+    },
+    configureServer(server) {
+      server.middlewares.use(handler);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(handler);
+    },
+  };
+}
 
 export default defineConfig({
+  vite: { plugins: [tmdbProxy()] },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

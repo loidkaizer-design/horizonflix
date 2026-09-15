@@ -9,15 +9,6 @@ import { recordWatch } from "@/lib/fandomhub";
 
 type PlayerEventName = "play" | "pause" | "seeked" | "ended" | "timeupdate";
 
-type VidLinkPlayerEvent = {
-  type?: "PLAYER_EVENT";
-  data?: {
-    event?: PlayerEventName;
-    currentTime?: number;
-    duration?: number;
-  };
-};
-
 export const Route = createFileRoute("/watch/$id")({
   head: () => ({
     meta: [
@@ -40,25 +31,6 @@ function WatchPage() {
   const [playerEvent, setPlayerEvent] = useState<PlayerEventName | "ready">("ready");
   const [playerProgress, setPlayerProgress] = useState(0);
 
-  useEffect(() => {
-    const onMessage = (event: MessageEvent<VidLinkPlayerEvent>) => {
-      if (event.origin !== "https://vidlink.pro" || event.data?.type !== "PLAYER_EVENT") return;
-      const data = event.data.data;
-      if (!data?.event) return;
-      setPlayerEvent(data.event);
-      if (
-        typeof data.currentTime === "number" &&
-        typeof data.duration === "number" &&
-        data.duration > 0
-      ) {
-        setPlayerProgress(Math.min(100, Math.max(0, (data.currentTime / data.duration) * 100)));
-      }
-    };
-
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, []);
-
   const movie = useQuery({ queryKey: ["movie", id], queryFn: () => getMovie(id), enabled: ready });
   const top = useQuery({ queryKey: ["trending"], queryFn: getTrending, enabled: ready });
 
@@ -76,7 +48,7 @@ function WatchPage() {
 
   if (!ready) return <div className="min-h-screen" />;
 
-  const src = playerUrl(movie.data?.imdb_id || id);
+  const src = playerUrl(id);
 
   return (
     <div className="min-h-screen">
@@ -97,7 +69,7 @@ function WatchPage() {
               <iframe
                 key={reloadKey}
                 src={src}
-                title={movie.data ? titleOf(movie.data) : "VidLink Player"}
+                title={movie.data ? titleOf(movie.data) : "Kanto-Flix player"}
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="origin"
@@ -117,7 +89,7 @@ function WatchPage() {
               )}
             </span>
             <span className="inline-flex items-center gap-3">
-              <span>Playback provided by VidLink.</span>
+              <span>Playback provided by Kanto-Flix player.</span>
               <button
                 onClick={() => {
                   setPlayerEvent("ready");
