@@ -277,3 +277,24 @@
     transform: translate3d(22px, -14px, 0) scale(1.12);
   }
 }
+
+/* Scroll-pinning hero — keep the hero's backdrop visually pinned while the
+   categories section slides up over it. The hero <section> is `sticky top-16`
+   inside a wrapper that reserves 30vh of extra scroll room. */
+.hero-overlay {
+  /* Soft inner shadow at the top edge so the overlay reads as a "card"
+     rising up over the pinned hero. */
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--background) 92%, transparent),
+    var(--background) 64px
+  );
+}
+
+/* Respect users who prefer reduced motion — disable the parallax/scaling
+   transforms and just keep the natural sticky behavior. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

@@ -20,7 +20,13 @@ export type Movie = {
 async function tmdb<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const query = new URLSearchParams(params);
   const res = await fetch(`${BASE}${path}${query.size ? `?${query}` : ""}`);
-  if (!res.ok) throw new Error(`TMDB request failed (${res.status})`);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    console.error(
+      `[tmdb] request failed: ${res.status} ${res.statusText} — ${path}?${query} — body: ${text.slice(0, 200)}`,
+    );
+    throw new Error(`TMDB request failed (${res.status})`);
+  }
   return (await res.json()) as T;
 }
 
