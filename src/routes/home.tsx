@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Info, Play, Star } from "lucide-react";
 import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
 import { MovieCard, MovieRow, RowSkeleton } from "@/components/MovieCard";
@@ -65,6 +65,13 @@ function HomePage() {
   });
   const heroMovies = (trending.data ?? []).filter((m) => m.backdrop_path).slice(0, 16);
   const hero = heroMovies[active % Math.max(heroMovies.length, 1)];
+  const suggestedMovies = useMemo(() => {
+    const unique = new Map<number, Movie>();
+    [...(trending.data ?? []), ...(popular.data ?? []), ...(latest.data ?? []), ...(pinoy.data ?? [])].forEach(
+      (movie) => unique.set(movie.id, movie),
+    );
+    return Array.from(unique.values()).sort(() => Math.random() - 0.5);
+  }, [trending.data, popular.data, latest.data, pinoy.data]);
 
   useEffect(() => {
     if (heroMovies.length < 2) return;
@@ -212,6 +219,26 @@ function HomePage() {
             movies={latest.data ?? []}
             loading={latest.isLoading}
           />
+          <div className="mt-10 border-t border-border/60 pt-2">
+            <MovieSection
+              title="Suggested for You"
+              eyebrow="A random bundle for tonight"
+              movies={suggestedMovies}
+              loading={trending.isLoading || popular.isLoading || latest.isLoading}
+            />
+            <MovieSection
+              title="More Movie Picks"
+              eyebrow="Keep exploring the neighborhood"
+              movies={[...suggestedMovies].reverse()}
+              loading={trending.isLoading || popular.isLoading || latest.isLoading}
+            />
+            <MovieSection
+              title="Just Press Play"
+              eyebrow="Random picks, no overthinking"
+              movies={suggestedMovies.slice(5).concat(suggestedMovies.slice(0, 5))}
+              loading={trending.isLoading || popular.isLoading || latest.isLoading}
+            />
+          </div>
         </main>
       )}
       <Attribution />
