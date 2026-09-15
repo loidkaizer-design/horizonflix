@@ -42,13 +42,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="kanto-error flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+        <p className="mb-4 text-xs font-bold tracking-[0.3em] text-accent uppercase">Kanto-Flix</p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+          Sandali lang, kapitbahay.
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Hindi nag-load ang pahinang ito. Subukan muli o bumalik sa sinehan.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -77,13 +78,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "HorizonFlix — Premium Movie Streaming" },
+      { title: "Kanto-Flix — Pelikula sa Kanto" },
       {
         name: "description",
         content: "Browse trending movies, connect with fans, and start watching instantly.",
       },
       { name: "author", content: "Fantomistic" },
-      { property: "og:title", content: "HorizonFlix — Premium Movie Streaming" },
+      { property: "og:title", content: "Kanto-Flix — Pelikula sa Kanto" },
       {
         property: "og:description",
         content: "Browse trending movies, connect with fans, and start watching instantly.",

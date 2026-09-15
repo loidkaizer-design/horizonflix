@@ -10,15 +10,15 @@ import { img } from "@/lib/tmdb";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your Profile — HorizonFlix" },
+      { title: "Your Profile — Kanto-Flix" },
       {
         name: "description",
-        content: "Update your HorizonFlix display name and avatar, and review your saved titles.",
+        content: "Update your Kanto-Flix display name and avatar, and review your saved titles.",
       },
-      { property: "og:title", content: "Your Profile — HorizonFlix" },
+      { property: "og:title", content: "Your Profile — Kanto-Flix" },
       {
         property: "og:description",
-        content: "Manage your HorizonFlix account details and saved movies.",
+        content: "Manage your Kanto-Flix account details and saved movies.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

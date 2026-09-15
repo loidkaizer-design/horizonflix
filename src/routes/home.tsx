@@ -24,13 +24,13 @@ export const Route = createFileRoute("/home")({
     typeof search["q"] === "string" && search["q"] ? { q: search["q"] } : {},
   head: () => ({
     meta: [
-      { title: "Browse Movies — HorizonFlix" },
+      { title: "Browse Movies — Kanto-Flix" },
       {
         name: "description",
         content:
-          "Trending, action, comedy and top rated movies, streaming instantly on HorizonFlix.",
+          "Trending, action, comedy and top rated movies, streaming instantly on Kanto-Flix.",
       },
-      { property: "og:title", content: "Browse Movies — HorizonFlix" },
+      { property: "og:title", content: "Browse Movies — Kanto-Flix" },
       {
         property: "og:description",
         content: "Trending, action, comedy and top rated movies, streaming instantly.",

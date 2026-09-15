@@ -134,7 +134,7 @@ export function Navigation() {
 export function Attribution() {
   return (
     <footer className="mt-20 border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-      <p className="tracking-[0.3em] uppercase">HorizonFlix</p>
+      <p className="tracking-[0.3em] uppercase">Kanto-Flix</p>
       <p className="mt-2">
         Powered by <span className="font-semibold text-accent">Fantomistic</span>
       </p>

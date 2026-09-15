@@ -21,12 +21,12 @@ type VidLinkPlayerEvent = {
 export const Route = createFileRoute("/watch/$id")({
   head: () => ({
     meta: [
-      { title: "Now Playing — HorizonFlix" },
-      { name: "description", content: "Stream the movie with a top 10 sidebar on HorizonFlix." },
-      { property: "og:title", content: "Now Playing — HorizonFlix" },
+      { title: "Now Playing — Kanto-Flix" },
+      { name: "description", content: "Stream the movie with a top 10 sidebar on Kanto-Flix." },
+      { property: "og:title", content: "Now Playing — Kanto-Flix" },
       {
         property: "og:description",
-        content: "Stream the movie with a top 10 sidebar on HorizonFlix.",
+        content: "Stream the movie with a top 10 sidebar on Kanto-Flix.",
       },
     ],
   }),

@@ -4,7 +4,7 @@ import { generateUserId } from "@/lib/fandomhub";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HorizonFlix — Find Your Next Favorite" },
+      { title: "Kanto-Flix — Pelikula sa Kanto" },
       { name: "description", content: "Browse, watch, and talk about the movies you love." },
     ],
   }),
