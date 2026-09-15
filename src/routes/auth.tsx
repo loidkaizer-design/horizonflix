@@ -9,16 +9,16 @@ import { Logo } from "@/components/Logo";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in or join — HorizonFlix" },
+      { title: "Sign in or join — Kanto-Flix" },
       {
         name: "description",
         content:
-          "Create a free HorizonFlix account to comment on movies, build a watchlist and customise your profile.",
+          "Create a free Kanto-Flix account to comment on movies, build a watchlist and customise your profile.",
       },
-      { property: "og:title", content: "Sign in or join — HorizonFlix" },
+      { property: "og:title", content: "Sign in or join — Kanto-Flix" },
       {
         property: "og:description",
-        content: "Free account for comments, watchlist and your own profile on HorizonFlix.",
+        content: "Free account for comments, watchlist and your own profile on Kanto-Flix.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

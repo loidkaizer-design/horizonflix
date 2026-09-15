@@ -8,9 +8,9 @@ import { getPerson, img } from "@/lib/tmdb";
 export const Route = createFileRoute("/cast/$id")({
   head: () => ({
     meta: [
-      { title: "Cast Profile — HorizonFlix" },
+      { title: "Cast Profile — Kanto-Flix" },
       { name: "description", content: "Biography and full filmography for this actor." },
-      { property: "og:title", content: "Cast Profile — HorizonFlix" },
+      { property: "og:title", content: "Cast Profile — Kanto-Flix" },
       { property: "og:description", content: "Biography and full filmography for this actor." },
     ],
   }),

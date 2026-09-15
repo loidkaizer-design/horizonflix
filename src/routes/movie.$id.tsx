@@ -11,15 +11,15 @@ import { getDivineTrailerUrl, getMovie, img, titleOf, year } from "@/lib/tmdb";
 export const Route = createFileRoute("/movie/$id")({
   head: () => ({
     meta: [
-      { title: "Movie Details — HorizonFlix" },
+      { title: "Movie Details — Kanto-Flix" },
       {
         name: "description",
-        content: "Synopsis, rating, cast and gallery for this title on HorizonFlix.",
+        content: "Synopsis, rating, cast and gallery for this title on Kanto-Flix.",
       },
-      { property: "og:title", content: "Movie Details — HorizonFlix" },
+      { property: "og:title", content: "Movie Details — Kanto-Flix" },
       {
         property: "og:description",
-        content: "Synopsis, rating, cast and gallery for this title on HorizonFlix.",
+        content: "Synopsis, rating, cast and gallery for this title on Kanto-Flix.",
       },
     ],
   }),

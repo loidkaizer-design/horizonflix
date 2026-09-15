@@ -10,10 +10,10 @@ import { img } from "@/lib/tmdb";
 export const Route = createFileRoute("/watchlist")({
   head: () => ({
     meta: [
-      { title: "Your Watchlist — HorizonFlix" },
-      { name: "description", content: "Movies you saved to watch later on HorizonFlix." },
-      { property: "og:title", content: "Your Watchlist — HorizonFlix" },
-      { property: "og:description", content: "Movies you saved to watch later on HorizonFlix." },
+      { title: "Your Watchlist — Kanto-Flix" },
+      { name: "description", content: "Movies you saved to watch later on Kanto-Flix." },
+      { property: "og:title", content: "Your Watchlist — Kanto-Flix" },
+      { property: "og:description", content: "Movies you saved to watch later on Kanto-Flix." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
