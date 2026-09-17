@@ -98,9 +98,12 @@ function HomePage() {
   const hero = heroMovies[active % Math.max(heroMovies.length, 1)];
   const suggestedMovies = useMemo(() => {
     const unique = new Map<number, Movie>();
-    [...(trending.data ?? []), ...(popular.data ?? []), ...(latest.data ?? []), ...(pinoy.data ?? [])].forEach(
-      (movie) => unique.set(movie.id, movie),
-    );
+    [
+      ...(trending.data ?? []),
+      ...(popular.data ?? []),
+      ...(latest.data ?? []),
+      ...(pinoy.data ?? []),
+    ].forEach((movie) => unique.set(movie.id, movie));
     return Array.from(unique.values()).sort(() => Math.random() - 0.5);
   }, [trending.data, popular.data, latest.data, pinoy.data]);
 
@@ -155,10 +158,7 @@ function HomePage() {
             so the sticky <section> stays pinned while the categories <main>
             slides up over it. z-0 puts the hero BEHIND main.
           */}
-          <div
-            className="relative z-0"
-            style={{ height: "calc(100svh - 4rem + 30vh)" }}
-          >
+          <div className="relative z-0" style={{ height: "calc(100svh - 4rem + 30vh)" }}>
             <section className="sticky top-16 z-0 h-[calc(100svh-4rem)] overflow-hidden">
               <div className="absolute inset-0 bg-black">
                 {hero && (
@@ -258,9 +258,7 @@ function HomePage() {
                 className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground transition-opacity duration-500"
                 style={{ opacity: indicatorOpacity }}
               >
-                <span className="text-[10px] font-semibold tracking-[0.3em] uppercase">
-                  Scroll
-                </span>
+                <span className="text-[10px] font-semibold tracking-[0.3em] uppercase">Scroll</span>
                 <ChevronDown className="size-5 animate-bounce" />
               </div>
             </section>
@@ -268,50 +266,51 @@ function HomePage() {
         </>
       )}
       {!q && (
-        <main
-          className="hero-overlay relative z-10 -mt-[30vh] rounded-t-[2rem] border-t border-border/60 bg-background pb-12 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.85)]"
-        >
+        <main className="hero-overlay scroll-pinning-content relative z-10 -mt-[30vh] rounded-t-[2rem] border-t border-border/60 bg-background pb-12 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.85)]">
           <div className="mx-auto max-w-7xl">
-          <section>
+            <section>
+              <MovieSection
+                title="Most Watched"
+                eyebrow="Popular with the neighborhood"
+                movies={popular.data ?? []}
+                loading={popular.isLoading}
+                error={popular.error}
+              />
+            </section>
             <MovieSection
-              title="Most Watched"
-              eyebrow="Popular with the neighborhood"
-              movies={popular.data ?? []}
-              loading={popular.isLoading}
-            />
-          </section>
-          <MovieSection
-            title="Pinoy Movies"
-            eyebrow="Stories from home"
-            movies={pinoy.data ?? []}
-            loading={pinoy.isLoading}
-          />
-          <MovieSection
-            title="Latest"
-            eyebrow="Fresh from the cinema"
-            movies={latest.data ?? []}
-            loading={latest.isLoading}
-          />
-          <div className="mt-10 border-t border-border/60 pt-2">
-            <MovieSection
-              title="Suggested for You"
-              eyebrow="A random bundle for tonight"
-              movies={suggestedMovies}
-              loading={trending.isLoading || popular.isLoading || latest.isLoading}
+              title="Pinoy Movies"
+              eyebrow="Stories from home"
+              movies={pinoy.data ?? []}
+              loading={pinoy.isLoading}
+              error={pinoy.error}
             />
             <MovieSection
-              title="More Movie Picks"
-              eyebrow="Keep exploring the neighborhood"
-              movies={[...suggestedMovies].reverse()}
-              loading={trending.isLoading || popular.isLoading || latest.isLoading}
+              title="Latest"
+              eyebrow="Fresh from the cinema"
+              movies={latest.data ?? []}
+              loading={latest.isLoading}
+              error={latest.error}
             />
-            <MovieSection
-              title="Just Press Play"
-              eyebrow="Random picks, no overthinking"
-              movies={suggestedMovies.slice(5).concat(suggestedMovies.slice(0, 5))}
-              loading={trending.isLoading || popular.isLoading || latest.isLoading}
-            />
-          </div>
+            <div className="mt-10 border-t border-border/60 pt-2">
+              <MovieSection
+                title="Suggested for You"
+                eyebrow="A random bundle for tonight"
+                movies={suggestedMovies}
+                loading={trending.isLoading || popular.isLoading || latest.isLoading}
+              />
+              <MovieSection
+                title="More Movie Picks"
+                eyebrow="Keep exploring the neighborhood"
+                movies={[...suggestedMovies].reverse()}
+                loading={trending.isLoading || popular.isLoading || latest.isLoading}
+              />
+              <MovieSection
+                title="Just Press Play"
+                eyebrow="Random picks, no overthinking"
+                movies={suggestedMovies.slice(5).concat(suggestedMovies.slice(0, 5))}
+                loading={trending.isLoading || popular.isLoading || latest.isLoading}
+              />
+            </div>
           </div>
         </main>
       )}
@@ -324,11 +323,13 @@ function MovieSection({
   eyebrow,
   movies,
   loading,
+  error,
 }: {
   title: string;
   eyebrow: string;
   movies: Movie[];
   loading: boolean;
+  error?: Error | null;
 }) {
   const lovengo: Movie = {
     id: 1700944,
@@ -350,7 +351,19 @@ function MovieSection({
           <h2 className="mt-1 text-2xl font-black sm:text-3xl">{title}</h2>
         </div>
       </div>
-      {loading ? <RowSkeleton /> : <MovieRow title="" movies={list.slice(0, 16)} />}
+      {loading ? (
+        <RowSkeleton />
+      ) : error ? (
+        <div className="mx-4 mt-4 rounded-2xl border border-destructive/30 bg-destructive/5 px-5 py-6 text-sm text-muted-foreground sm:mx-8">
+          Movies could not load right now. Please refresh to try TMDB again.
+        </div>
+      ) : list.length ? (
+        <MovieRow title="" movies={list.slice(0, 16)} />
+      ) : (
+        <div className="mx-4 mt-4 rounded-2xl border border-border bg-muted/30 px-5 py-6 text-sm text-muted-foreground sm:mx-8">
+          No movies are available in this bundle yet.
+        </div>
+      )}
     </section>
   );
 }
