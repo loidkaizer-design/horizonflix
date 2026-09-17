@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Info, Play, Star } from "lucide-react";
-import { Navigation, Attribution, useTicketGuard } from "@/components/Navigation";
+import { Navigation, Attribution } from "@/components/Navigation";
 import { MovieCard, MovieRow, RowSkeleton } from "@/components/MovieCard";
 import { MovieLogo } from "@/components/MovieLogo";
 import {
@@ -61,38 +61,36 @@ function useHeroPinProgress(pinDistanceVh = 30) {
 }
 
 function HomePage() {
-  const ready = useTicketGuard();
   const { q } = Route.useSearch();
   const [active, setActive] = useState(0);
   const pin = useHeroPinProgress(30);
   const trending = useQuery({
     queryKey: ["trending"],
-    queryFn: getTrending,
-    enabled: ready,
-    staleTime: 1000 * 60 * 10,
+    queryFn: () => getTrending(1),
+    enabled: true,
   });
   const popular = useQuery({
     queryKey: ["popular"],
     queryFn: getPopular,
-    enabled: ready,
+    enabled: true,
     staleTime: 1000 * 60 * 10,
   });
   const pinoy = useQuery({
     queryKey: ["pinoy"],
     queryFn: getPinoyMovies,
-    enabled: ready,
+    enabled: true,
     staleTime: 1000 * 60 * 10,
   });
   const latest = useQuery({
     queryKey: ["latest"],
     queryFn: getLatest,
-    enabled: ready,
+    enabled: true,
     staleTime: 1000 * 60 * 10,
   });
   const results = useQuery({
     queryKey: ["search", q],
     queryFn: () => searchMovies(q!),
-    enabled: ready && !!q,
+    enabled: !!q,
   });
   const heroMovies = (trending.data ?? []).filter((m) => m.backdrop_path).slice(0, 16);
   const hero = heroMovies[active % Math.max(heroMovies.length, 1)];
@@ -115,8 +113,6 @@ function HomePage() {
   useEffect(() => {
     if (active >= heroMovies.length) setActive(0);
   }, [active, heroMovies.length]);
-  if (!ready) return <div className="min-h-screen" />;
-
   // Pinning transforms — applied to hero content so it recedes smoothly
   // as the categories section slides up over it.
   const heroScale = 1 - pin * 0.18;

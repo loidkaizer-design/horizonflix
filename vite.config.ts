@@ -41,7 +41,8 @@ function tmdbProxy(): Plugin {
   return {
     name: "tmdb-server-proxy",
     config(_, env) {
-      token = loadEnv(env.mode, process.cwd(), "").TMDB_API_TOKEN ?? "";
+      const envValues = loadEnv(env.mode, process.cwd(), "");
+      token = envValues.TMDB_API_TOKEN || process.env.TMDB_API_TOKEN || "";
     },
     configureServer(server) {
       server.middlewares.use(handler);
