@@ -68,31 +68,31 @@ function HomePage() {
   const trending = useQuery({
     queryKey: ["trending"],
     queryFn: getTrending,
-    enabled: ready && typeof window !== "undefined",
+    enabled: ready,
     staleTime: 1000 * 60 * 10,
   });
   const popular = useQuery({
     queryKey: ["popular"],
     queryFn: getPopular,
-    enabled: ready && typeof window !== "undefined",
+    enabled: ready,
     staleTime: 1000 * 60 * 10,
   });
   const pinoy = useQuery({
     queryKey: ["pinoy"],
     queryFn: getPinoyMovies,
-    enabled: ready && typeof window !== "undefined",
+    enabled: ready,
     staleTime: 1000 * 60 * 10,
   });
   const latest = useQuery({
     queryKey: ["latest"],
     queryFn: getLatest,
-    enabled: ready && typeof window !== "undefined",
+    enabled: ready,
     staleTime: 1000 * 60 * 10,
   });
   const results = useQuery({
     queryKey: ["search", q],
     queryFn: () => searchMovies(q!),
-    enabled: ready && typeof window !== "undefined" && !!q,
+    enabled: ready && !!q,
   });
   const heroMovies = (trending.data ?? []).filter((m) => m.backdrop_path).slice(0, 16);
   const hero = heroMovies[active % Math.max(heroMovies.length, 1)];
@@ -104,7 +104,7 @@ function HomePage() {
       ...(latest.data ?? []),
       ...(pinoy.data ?? []),
     ].forEach((movie) => unique.set(movie.id, movie));
-    return Array.from(unique.values()).sort(() => Math.random() - 0.5);
+    return Array.from(unique.values()).sort((a, b) => a.id - b.id);
   }, [trending.data, popular.data, latest.data, pinoy.data]);
 
   useEffect(() => {
