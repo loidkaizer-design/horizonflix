@@ -6,6 +6,7 @@ import { Attribution, Navigation } from "@/components/Navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchProfile, fetchWatchlist, saveProfile } from "@/lib/account";
 import { img } from "@/lib/tmdb";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -38,6 +39,7 @@ function ProfilePage() {
   const client = useQueryClient();
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [birthDate, setBirthDate] = useState("");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -53,6 +55,9 @@ function ProfilePage() {
     if (profile.data) {
       setDisplayName(profile.data.display_name ?? "");
       setAvatarUrl(profile.data.avatar_url ?? null);
+      setBirthDate(
+        typeof user?.user_metadata?.birth_date === "string" ? user.user_metadata.birth_date : "",
+      );
     }
   }, [profile.data]);
 
@@ -63,8 +68,13 @@ function ProfilePage() {
   });
 
   const save = useMutation({
-    mutationFn: () =>
-      saveProfile(user!.id, { display_name: displayName.trim() || "Viewer", avatar_url: avatarUrl }),
+    mutationFn: async () => {
+      await supabase.auth.updateUser({ data: { birth_date: birthDate } });
+      return saveProfile(user!.id, {
+        display_name: displayName.trim() || "Viewer",
+        avatar_url: avatarUrl,
+      });
+    },
     onSuccess: () => client.invalidateQueries({ queryKey: ["profile", user?.id] }),
   });
 
@@ -82,7 +92,9 @@ function ProfilePage() {
         </Link>
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_300px]">
           <section className="glass animate-rise rounded-3xl p-6 sm:p-8">
-            <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">Your profile</p>
+            <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">
+              Your profile
+            </p>
             <h1 className="mt-2 text-3xl font-extrabold">Make it yours.</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Your name and avatar appear next to the comments you post.
@@ -100,6 +112,18 @@ function ProfilePage() {
             <p className="mt-4 text-sm text-muted-foreground">
               Signed in as <span className="text-foreground">{user?.email}</span>
             </p>
+            <label className="mt-5 block text-sm font-semibold">
+              Date of birth
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-border bg-secondary/60 px-4 py-3 font-normal outline-none transition-colors focus:border-accent"
+              />
+              <span className="mt-2 block text-xs font-normal text-muted-foreground">
+                Used only to enforce age ratings. Adult titles require a signed-in account aged 18+.
+              </span>
+            </label>
 
             <div className="mt-8">
               <h2 className="text-lg font-bold">Choose an avatar</h2>
@@ -132,7 +156,10 @@ function ProfilePage() {
             )}
           </section>
 
-          <aside className="glass animate-rise h-fit rounded-3xl p-6" style={{ animationDelay: "80ms" }}>
+          <aside
+            className="glass animate-rise h-fit rounded-3xl p-6"
+            style={{ animationDelay: "80ms" }}
+          >
             <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase">Watchlist</p>
             <h2 className="mt-2 text-2xl font-extrabold">Saved titles</h2>
             <div className="mt-6 flex flex-col gap-3">
@@ -160,10 +187,7 @@ function ProfilePage() {
                 </Link>
               ))}
             </div>
-            <Link
-              to="/watchlist"
-              className="mt-5 inline-flex text-sm text-accent hover:underline"
-            >
+            <Link to="/watchlist" className="mt-5 inline-flex text-sm text-accent hover:underline">
               View full watchlist
             </Link>
           </aside>

@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { img, titleOf, year, type Movie } from "@/lib/tmdb";
 import { MovieLogo } from "@/components/MovieLogo";
+import { ageLabelClass, ageRating } from "@/lib/ratings";
 
 export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }) {
   const poster = img(movie.poster_path, "w500");
@@ -13,6 +14,12 @@ export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >
       <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)]">
+        <span
+          aria-label={`Age rating ${ageRating(movie)}`}
+          className={`absolute top-2 right-2 z-10 rounded-bl-xl rounded-tr-xl border px-2 py-1 text-[10px] font-black tracking-wide shadow-lg ${ageLabelClass(ageRating(movie))}`}
+        >
+          {ageRating(movie)}
+        </span>
         {poster ? (
           <img
             src={poster}

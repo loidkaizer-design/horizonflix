@@ -281,6 +281,20 @@
 /* Scroll-pinning hero — keep the hero's backdrop visually pinned while the
    categories section slides up over it. The hero <section> is `sticky top-16`
    inside a wrapper that reserves 30vh of extra scroll room. */
+.scroll-pinning-content {
+  will-change: transform;
+  transition:
+    border-radius 500ms ease,
+    box-shadow 500ms ease;
+}
+
+@media (max-width: 640px) {
+  .scroll-pinning-content {
+    margin-top: -18vh;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+}
+
 .hero-overlay {
   /* Soft inner shadow at the top edge so the overlay reads as a "card"
      rising up over the pinned hero. */
