@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Kanto-Flix — Pelikula sa Kanto" },
+      { title: "Kantoflix — Pelikula sa Kanto" },
       {
         name: "description",
         content: "Browse trending movies, connect with fans, and start watching instantly.",
@@ -100,7 +100,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "icon", href: "/kantoflix.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/kantoflix.png" },
     ],
   }),
   shellComponent: RootShell,

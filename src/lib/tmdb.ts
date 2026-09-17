@@ -15,6 +15,7 @@ export type Movie = {
   first_air_date?: string;
   overview: string;
   media_type?: string;
+  adult?: boolean;
 };
 
 async function tmdb<T>(path: string, params: Record<string, string> = {}): Promise<T> {

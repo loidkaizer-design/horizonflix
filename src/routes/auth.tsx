@@ -34,6 +34,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -53,12 +54,16 @@ function AuthPage() {
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: displayName.trim() || email.split("@")[0] },
+          data: {
+            display_name: displayName.trim() || email.split("@")[0],
+            birth_date: birthDate,
+          },
         },
       });
       setBusy(false);
       if (err) return setError(err.message);
-      if (!data.session) return setNotice("Check your email to confirm your account, then sign in.");
+      if (!data.session)
+        return setNotice("Check your email to confirm your account, then sign in.");
       navigate({ to: "/home" });
       return;
     }
@@ -120,15 +125,27 @@ function AuthPage() {
 
         <form onSubmit={onSubmit} className="space-y-3">
           {mode === "signup" && (
-            <div className="relative">
-              <UserRound className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Display name"
-                className="w-full rounded-xl border border-border bg-secondary/60 py-3 pr-4 pl-11 text-sm outline-none transition-all focus:border-accent"
-              />
-            </div>
+            <>
+              <div className="relative">
+                <UserRound className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Display name"
+                  className="w-full rounded-xl border border-border bg-secondary/60 py-3 pr-4 pl-11 text-sm outline-none transition-all focus:border-accent"
+                />
+              </div>
+              <label className="mt-3 block text-left text-xs text-muted-foreground">
+                Date of birth (required for 18+ titles)
+                <input
+                  type="date"
+                  required
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-border bg-secondary/60 px-4 py-3 text-sm text-foreground outline-none focus:border-accent"
+                />
+              </label>
+            </>
           )}
           <div className="relative">
             <Mail className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

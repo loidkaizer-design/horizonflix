@@ -6,17 +6,20 @@ import { MovieCard, RowSkeleton } from "@/components/MovieCard";
 import { MovieLogo } from "@/components/MovieLogo";
 import { Comments } from "@/components/Comments";
 import { WatchlistButton } from "@/components/WatchlistButton";
+import { AgeGate } from "@/components/AgeGate";
+import { useAuth } from "@/hooks/useAuth";
+import { ageRating, isAdult } from "@/lib/ratings";
 import { getDivineTrailerUrl, getMovie, img, titleOf, year } from "@/lib/tmdb";
 
 export const Route = createFileRoute("/movie/$id")({
   head: () => ({
     meta: [
-      { title: "Movie Details — Kanto-Flix" },
+      { title: "Movie Details — Kantoflix" },
       {
         name: "description",
         content: "Synopsis, rating, cast and gallery for this title on Kanto-Flix.",
       },
-      { property: "og:title", content: "Movie Details — Kanto-Flix" },
+      { property: "og:title", content: "Movie Details — Kantoflix" },
       {
         property: "og:description",
         content: "Synopsis, rating, cast and gallery for this title on Kanto-Flix.",
@@ -28,6 +31,7 @@ export const Route = createFileRoute("/movie/$id")({
 
 function MoviePage() {
   const ready = useTicketGuard();
+  const { user } = useAuth();
   const { id } = Route.useParams();
   const {
     data: movie,
@@ -90,7 +94,9 @@ function MoviePage() {
             <p className="mt-10 text-destructive">We couldn't load this title. Please try again.</p>
           )}
 
-          {movie && (
+          {movie && ageRating(movie) === "18+" && !isAdult(user) ? (
+            <AgeGate signedIn={Boolean(user)} verifiedAdult={false} />
+          ) : movie ? (
             <>
               <div className="mt-6 flex flex-col gap-8 md:flex-row">
                 {img(movie.poster_path, "w500") && (
@@ -215,7 +221,7 @@ function MoviePage() {
                 </section>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </div>
       <Attribution />
