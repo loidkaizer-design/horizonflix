@@ -23,9 +23,7 @@ export function MovieLogo({ movie, className = "" }: { movie: Movie; className?:
           className="max-h-14 max-w-full object-contain object-left"
         />
       ) : (
-        <span className="line-clamp-2 leading-tight">
-          {titleOf(movie)}
-        </span>
+        <span className="line-clamp-2 leading-tight">{titleOf(movie)}</span>
       )}
     </span>
   );
