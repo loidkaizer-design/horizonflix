@@ -5,11 +5,13 @@ import { ChevronDown, ChevronLeft, ChevronRight, Info, Play, Star } from "lucide
 import { Navigation, Attribution } from "@/components/Navigation";
 import { MovieCard, MovieRow, RowSkeleton } from "@/components/MovieCard";
 import { MovieLogo } from "@/components/MovieLogo";
+import { getWatchHistory } from "@/lib/fandomhub";
 import {
   getLatest,
   getPinoyMovies,
   getPopular,
   getTrending,
+  getMovie,
   img,
   searchMovies,
   titleOf,
@@ -63,10 +65,30 @@ function useHeroPinProgress(pinDistanceVh = 30) {
 function HomePage() {
   const { q } = Route.useSearch();
   const [active, setActive] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
   const pin = useHeroPinProgress(30);
+  useEffect(() => setUserId(localStorage.getItem("horizonflix-user-id")), []);
+  const recentHistory = useQuery({
+    queryKey: ["recent-history", userId],
+    queryFn: () => getWatchHistory(userId!),
+    enabled: Boolean(userId),
+    staleTime: 1000 * 60 * 10,
+  });
+  const recentMovies = useQuery({
+    queryKey: ["recent-movies", recentHistory.data?.map((entry) => entry.tmdbId)],
+    queryFn: async () =>
+      Promise.all((recentHistory.data ?? []).slice(0, 12).map((entry) => getMovie(entry.tmdbId))),
+    enabled: Boolean(recentHistory.data?.length),
+    staleTime: 1000 * 60 * 30,
+  });
+  const lovengo = useQuery({
+    queryKey: ["lovengo", 1700944],
+    queryFn: () => getMovie(1700944),
+    staleTime: 1000 * 60 * 60,
+  });
   const trending = useQuery({
     queryKey: ["trending"],
-    queryFn: () => getTrending(1),
+    queryFn: getTrending,
     enabled: true,
   });
   const popular = useQuery({
@@ -264,28 +286,36 @@ function HomePage() {
       {!q && (
         <main className="hero-overlay scroll-pinning-content relative z-10 -mt-[30vh] rounded-t-[2rem] border-t border-border/60 bg-background pb-12 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.85)]">
           <div className="mx-auto max-w-7xl">
+            {recentMovies.data?.length ? (
+              <MovieSection
+                title="Recents"
+                eyebrow="Pick up where you left off"
+                movies={recentMovies.data}
+              />
+            ) : null}
             <section>
               <MovieSection
                 title="Most Watched"
                 eyebrow="Popular with the neighborhood"
-                movies={popular.data ?? []}
-                loading={popular.isLoading}
-                error={popular.error}
+                movies={popular.data?.length ? popular.data : (trending.data ?? [])}
+                loading={popular.isLoading && !trending.data?.length}
+                error={popular.error && !trending.data?.length ? popular.error : null}
               />
             </section>
             <MovieSection
               title="Pinoy Movies"
               eyebrow="Stories from home"
-              movies={pinoy.data ?? []}
-              loading={pinoy.isLoading}
-              error={pinoy.error}
+              movies={pinoy.data?.length ? pinoy.data : (popular.data ?? [])}
+              extraMovie={lovengo.data}
+              loading={pinoy.isLoading && !popular.data?.length}
+              error={pinoy.error && !popular.data?.length ? pinoy.error : null}
             />
             <MovieSection
               title="Latest"
               eyebrow="Fresh from the cinema"
-              movies={latest.data ?? []}
-              loading={latest.isLoading}
-              error={latest.error}
+              movies={latest.data?.length ? latest.data : (trending.data ?? [])}
+              loading={latest.isLoading && !trending.data?.length}
+              error={latest.error && !trending.data?.length ? latest.error : null}
             />
             <div className="mt-10 border-t border-border/60 pt-2">
               <MovieSection
@@ -318,27 +348,19 @@ function MovieSection({
   title,
   eyebrow,
   movies,
+  extraMovie,
   loading,
   error,
 }: {
   title: string;
   eyebrow: string;
   movies: Movie[];
+  extraMovie?: Movie;
   loading: boolean;
   error?: Error | null;
 }) {
-  const lovengo: Movie = {
-    id: 1700944,
-    title: "Lovengo",
-    poster_path: null,
-    backdrop_path: null,
-    vote_average: 0,
-    overview: "",
-  };
   const list =
-    title === "Pinoy Movies" && !movies.some((m) => m.id === lovengo.id)
-      ? [lovengo, ...movies]
-      : movies;
+    extraMovie && !movies.some((m) => m.id === extraMovie.id) ? [extraMovie, ...movies] : movies;
   return (
     <section className="mt-8">
       <div className="flex items-end justify-between px-4 sm:px-8">

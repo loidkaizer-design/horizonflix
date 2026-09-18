@@ -33,10 +33,18 @@ function tmdbProxy(): Plugin {
     const headers: Record<string, string> = isV4BearerToken(token)
       ? { Authorization: `Bearer ${token}`, accept: "application/json" }
       : { accept: "application/json" };
-    const upstream = await fetch(target, { headers });
-    res.statusCode = upstream.status;
-    res.setHeader("content-type", "application/json");
-    res.end(await upstream.text());
+    try {
+      const upstream = await fetch(target, { headers, signal: AbortSignal.timeout(12000) });
+      res.statusCode = upstream.status;
+      res.setHeader("content-type", "application/json");
+      res.setHeader("cache-control", "public, max-age=300, stale-while-revalidate=3600");
+      res.end(await upstream.text());
+    } catch (error) {
+      console.error("[tmdb-proxy] upstream unavailable", error);
+      res.statusCode = 504;
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify({ error: "TMDB temporarily unavailable" }));
+    }
   };
   return {
     name: "tmdb-server-proxy",

@@ -18,17 +18,28 @@ export type Movie = {
   adult?: boolean;
 };
 
+const memoryCache = new Map<string, { expires: number; value: unknown }>();
+const CACHE_TTL = 1000 * 60 * 15;
+
 async function tmdb<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const query = new URLSearchParams(params);
-  const res = await fetch(`${BASE}${path}${query.size ? `?${query}` : ""}`);
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    console.error(
-      `[tmdb] request failed: ${res.status} ${res.statusText} — ${path}?${query} — body: ${text.slice(0, 200)}`,
-    );
-    throw new Error(`TMDB request failed (${res.status})`);
+  const key = `${path}?${query}`;
+  const cached = memoryCache.get(key);
+  if (cached && cached.expires > Date.now()) return cached.value as T;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const res = await fetch(`${BASE}${path}${query.size ? `?${query}` : ""}`, {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) throw new Error(`TMDB request failed (${res.status})`);
+    const value = (await res.json()) as T;
+    memoryCache.set(key, { expires: Date.now() + CACHE_TTL, value });
+    return value;
+  } finally {
+    clearTimeout(timeout);
   }
-  return (await res.json()) as T;
 }
 
 const pages = async (path: string, params: Record<string, string> = {}, count = 3) =>
@@ -55,11 +66,11 @@ export const getLatest = () =>
     3,
   );
 export const getPinoyMovies = () =>
-  pages(
-    "/discover/movie",
-    { with_origin_country: "PH", sort_by: "popularity.desc", "vote_count.gte": "3" },
-    3,
-  );
+  pages("/discover/movie", {
+    with_origin_country: "PH",
+    sort_by: "popularity.desc",
+    "vote_count.gte": "3",
+  });
 export const getByGenre = (genreId: number) =>
   pages("/discover/movie", { with_genres: String(genreId), sort_by: "popularity.desc" });
 export const getList = (list: string) => pages(`/movie/${list}`);
