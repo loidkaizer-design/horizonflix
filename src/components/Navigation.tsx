@@ -46,8 +46,13 @@ export function Navigation() {
     >
       <div className="mx-auto grid max-w-[1500px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-6">
-          <Link to="/home" className="shrink-0">
-            <Logo className="h-9 sm:h-10" />
+          <Link to="/home" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
+            <Logo className="h-9 w-9 sm:h-10 sm:w-10" />
+            <img
+              src="/kantoflix-wordmark.png"
+              alt="Kantoflix"
+              className="h-5 w-auto max-w-[min(38vw,220px)] object-contain sm:h-7"
+            />
           </Link>
           <nav className="hidden items-center gap-5 text-sm md:flex">
             <Link
@@ -134,7 +139,7 @@ export function Navigation() {
 export function Attribution() {
   return (
     <footer className="mt-20 border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-      <p className="tracking-[0.3em] uppercase">Kanto-Flix</p>
+      <p className="tracking-[0.3em] uppercase">Kantoflix</p>
       <p className="mt-2">
         Powered by <span className="font-semibold text-accent">Fantomistic</span>
       </p>
