@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { img, titleOf, year, type Movie } from "@/lib/tmdb";
 import { MovieLogo } from "@/components/MovieLogo";
-import { ageLabelClass, ageRating } from "@/lib/ratings";
+import { ageRating } from "@/lib/ratings";
 
 export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }) {
   const poster = img(movie.poster_path, "w500");

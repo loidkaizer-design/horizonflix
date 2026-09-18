@@ -5,7 +5,7 @@ import { titleOf, type Movie } from "@/lib/tmdb";
 
 export function MovieLogo({ movie, className = "" }: { movie: Movie; className?: string }) {
   const [imageFailed, setImageFailed] = useState(false);
-  const { data: logoUrl, isLoading } = useQuery({
+  const { data: logoUrl } = useQuery({
     queryKey: ["official-movie-logo", movie.id],
     queryFn: () => getOfficialMovieLogo(movie.id),
     staleTime: 1000 * 60 * 60,
