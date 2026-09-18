@@ -17,24 +17,27 @@ function isV4BearerToken(token: string): boolean {
 }
 
 function tmdbProxy(): Plugin {
-  let token = "";
+  let tokens: string[] = [];
   const handler: Connect.NextHandleFunction = async (req, res, next) => {
     if (!req.url?.startsWith("/api/tmdb")) return next();
-    if (!token) {
+    if (!tokens.length) {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: "TMDB is not configured" }));
       return;
     }
     const target = new URL(`https://api.themoviedb.org/3${req.url.replace(/^\/api\/tmdb/, "")}`);
-    // v3 keys need api_key query param; v4 tokens need Bearer header
-    if (!isV4BearerToken(token)) {
-      target.searchParams.set("api_key", token);
-    }
-    const headers: Record<string, string> = isV4BearerToken(token)
-      ? { Authorization: `Bearer ${token}`, accept: "application/json" }
-      : { accept: "application/json" };
     try {
-      const upstream = await fetch(target, { headers, signal: AbortSignal.timeout(12000) });
+      let upstream: Response | undefined;
+      for (const token of tokens) {
+        const requestUrl = new URL(target);
+        const headers: Record<string, string> = isV4BearerToken(token)
+          ? { Authorization: `Bearer ${token}`, accept: "application/json" }
+          : { accept: "application/json" };
+        if (!isV4BearerToken(token)) requestUrl.searchParams.set("api_key", token);
+        upstream = await fetch(requestUrl, { headers, signal: AbortSignal.timeout(12000) });
+        if (upstream.ok || ![401, 403].includes(upstream.status)) break;
+      }
+      if (!upstream) throw new Error("No TMDB token configured");
       res.statusCode = upstream.status;
       res.setHeader("content-type", "application/json");
       res.setHeader("cache-control", "public, max-age=300, stale-while-revalidate=3600");
@@ -50,7 +53,10 @@ function tmdbProxy(): Plugin {
     name: "tmdb-server-proxy",
     config(_, env) {
       const envValues = loadEnv(env.mode, process.cwd(), "");
-      token = envValues.TMDB_API_TOKEN || process.env.TMDB_API_TOKEN || "";
+      tokens = [
+        envValues.TMDB_API_TOKEN || process.env.TMDB_API_TOKEN,
+        envValues.TMDB_API_TOKEN_FALLBACK || process.env.TMDB_API_TOKEN_FALLBACK,
+      ].filter((value): value is string => Boolean(value?.trim()));
     },
     configureServer(server) {
       server.middlewares.use(handler);

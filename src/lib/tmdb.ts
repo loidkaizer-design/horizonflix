@@ -20,6 +20,7 @@ export type Movie = {
 
 const memoryCache = new Map<string, { expires: number; value: unknown }>();
 const CACHE_TTL = 1000 * 60 * 15;
+const STALE_CACHE_TTL = 1000 * 60 * 60 * 24;
 
 async function tmdb<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const query = new URLSearchParams(params);
@@ -37,6 +38,10 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
     const value = (await res.json()) as T;
     memoryCache.set(key, { expires: Date.now() + CACHE_TTL, value });
     return value;
+  } catch (error) {
+    const stale = memoryCache.get(key);
+    if (stale && stale.expires + STALE_CACHE_TTL > Date.now()) return stale.value as T;
+    throw error;
   } finally {
     clearTimeout(timeout);
   }
@@ -45,12 +50,17 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
 const pages = async (path: string, params: Record<string, string> = {}, count = 3) =>
   dedupe(
     (
-      await Promise.all(
+      await Promise.allSettled(
         Array.from({ length: count }, (_, i) =>
           tmdb<{ results: Movie[] }>(path, { ...params, page: String(i + 1) }),
         ),
       )
-    ).flatMap((d) => d.results),
+    )
+      .filter(
+        (result): result is PromiseFulfilledResult<{ results: Movie[] }> =>
+          result.status === "fulfilled",
+      )
+      .flatMap((result) => result.value.results ?? []),
   );
 
 export const getTrending = () => pages("/trending/movie/week", {}, 3);
