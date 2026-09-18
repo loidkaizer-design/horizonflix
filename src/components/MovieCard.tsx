@@ -14,12 +14,6 @@ export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >
       <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)]">
-        <span
-          aria-label={`Age rating ${ageRating(movie)}`}
-          className={`absolute top-2 right-2 z-10 rounded-bl-xl rounded-tr-xl border px-2 py-1 text-[10px] font-black tracking-wide shadow-lg ${ageLabelClass(ageRating(movie))}`}
-        >
-          {ageRating(movie)}
-        </span>
         {poster ? (
           <img
             src={poster}
@@ -38,10 +32,23 @@ export function MovieCard({ movie, index = 0 }: { movie: Movie; index?: number }
           {movie.vote_average?.toFixed(1)}
         </div>
       </div>
-      <p className="mt-2 truncate text-sm font-semibold transition-colors group-hover:text-accent">
-        <MovieLogo movie={movie} />
-      </p>
-      <p className="text-xs text-muted-foreground">{year(movie) || "—"}</p>
+      <div className="mt-3 flex min-h-[5.5rem] flex-col gap-2">
+        <MovieLogo
+          key={movie.id}
+          movie={movie}
+          className="text-sm font-semibold transition-colors group-hover:text-accent"
+        />
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span>{year(movie) || "—"}</span>
+          <span aria-hidden="true">•</span>
+          <span>{movie.vote_average ? `${movie.vote_average.toFixed(1)} rating` : "Unrated"}</span>
+          {ageRating(movie) === "18+" && (
+            <span className="rounded-full border border-destructive/50 bg-destructive/10 px-2 py-0.5 font-bold text-destructive">
+              18+ Mature
+            </span>
+          )}
+        </div>
+      </div>
     </Link>
   );
 }

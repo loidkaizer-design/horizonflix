@@ -23,7 +23,7 @@ export const Route = createFileRoute("/home")({
     typeof search.q === "string" && search.q ? { q: search.q } : {},
   head: () => ({
     meta: [
-      { title: "Browse Movies — Kanto-Flix" },
+      { title: "Browse Movies — Kantoflix" },
       { name: "description", content: "Your neighborhood cinema for the latest movies." },
     ],
   }),
