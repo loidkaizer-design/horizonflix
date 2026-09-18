@@ -90,6 +90,10 @@ function HomePage() {
     queryKey: ["trending"],
     queryFn: getTrending,
     enabled: true,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60 * 24,
   });
   const popular = useQuery({
     queryKey: ["popular"],
@@ -373,7 +377,8 @@ function MovieSection({
         <RowSkeleton />
       ) : error ? (
         <div className="mx-4 mt-4 rounded-2xl border border-destructive/30 bg-destructive/5 px-5 py-6 text-sm text-muted-foreground sm:mx-8">
-          Movies could not load right now. Please refresh to try TMDB again.
+          Movies are temporarily unavailable. We retried the TMDB connection and will keep the last
+          successful results cached. Please try again in a moment.
         </div>
       ) : list.length ? (
         <MovieRow title="" movies={list.slice(0, 16)} />

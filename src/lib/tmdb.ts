@@ -27,24 +27,29 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
   const key = `${path}?${query}`;
   const cached = memoryCache.get(key);
   if (cached && cached.expires > Date.now()) return cached.value as T;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
-  try {
-    const res = await fetch(`${BASE}${path}${query.size ? `?${query}` : ""}`, {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(`TMDB request failed (${res.status})`);
-    const value = (await res.json()) as T;
-    memoryCache.set(key, { expires: Date.now() + CACHE_TTL, value });
-    return value;
-  } catch (error) {
-    const stale = memoryCache.get(key);
-    if (stale && stale.expires + STALE_CACHE_TTL > Date.now()) return stale.value as T;
-    throw error;
-  } finally {
-    clearTimeout(timeout);
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      const res = await fetch(`${BASE}${path}${query.size ? `?${query}` : ""}`, {
+        signal: controller.signal,
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) throw new Error(`TMDB request failed (${res.status})`);
+      const value = (await res.json()) as T;
+      memoryCache.set(key, { expires: Date.now() + CACHE_TTL, value });
+      return value;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 400 * (attempt + 1)));
+    } finally {
+      clearTimeout(timeout);
+    }
   }
+  const stale = memoryCache.get(key);
+  if (stale && stale.expires + STALE_CACHE_TTL > Date.now()) return stale.value as T;
+  throw lastError instanceof Error ? lastError : new Error("TMDB is temporarily unavailable");
 }
 
 const pages = async (path: string, params: Record<string, string> = {}, count = 3) =>
