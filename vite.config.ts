@@ -5,7 +5,7 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { type Connect, type Plugin } from "vite";
+import { loadEnv, type Connect, type Plugin } from "vite";
 
 /**
  * Detect whether a TMDB token is a v3 API key (32-char hex) or a v4 Bearer JWT
@@ -51,9 +51,16 @@ function tmdbProxy(): Plugin {
   };
   return {
     name: "tmdb-server-proxy",
-    config() {
-      tokens = [process.env.TMDB_API_TOKEN, process.env.TMDB_API_TOKEN_FALLBACK].filter(
-        (value): value is string => Boolean(value?.trim()),
+    config(_, env) {
+      const fileEnv = loadEnv(env.mode, process.cwd(), "");
+      tokens = [
+        process.env.TMDB_API_TOKEN,
+        process.env.TMDB_API_TOKEN_FALLBACK,
+        fileEnv.TMDB_API_TOKEN,
+        fileEnv.TMDB_API_TOKEN_FALLBACK,
+      ].filter(
+        (value, index, values): value is string =>
+          Boolean(value?.trim()) && values.indexOf(value) === index,
       );
     },
     configureServer(server) {
