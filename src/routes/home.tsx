@@ -365,6 +365,8 @@ function MovieSection({
 }) {
   const list =
     extraMovie && !movies.some((m) => m.id === extraMovie.id) ? [extraMovie, ...movies] : movies;
+  const hasError = Boolean(error);
+  const isEmpty = !loading && !hasError && list.length === 0;
   return (
     <section className="mt-8">
       <div className="flex items-end justify-between px-4 sm:px-8">
@@ -382,11 +384,11 @@ function MovieSection({
         </div>
       ) : list.length ? (
         <MovieRow title="" movies={list.slice(0, 16)} />
-      ) : (
+      ) : isEmpty ? (
         <div className="mx-4 mt-4 rounded-2xl border border-border bg-muted/30 px-5 py-6 text-sm text-muted-foreground sm:mx-8">
-          No movies are available in this bundle yet.
+          No movies are available in this bundle yet. Try refreshing to load a fresh TMDB feed.
         </div>
-      )}
+      ) : null}
     </section>
   );
 }
