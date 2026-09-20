@@ -62,6 +62,13 @@ function tmdbProxy(): Plugin {
         (value, index, values): value is string =>
           Boolean(value?.trim()) && values.indexOf(value) === index,
       );
+      // Allow the sandbox/Vercel preview gateways to reach the dev & preview
+      // servers (Vite's host check blocks unknown Host headers otherwise).
+      // `true` = allow any host; safe here because this is a proxied dev box.
+      return {
+        server: { allowedHosts: true },
+        preview: { allowedHosts: true },
+      };
     },
     configureServer(server) {
       server.middlewares.use(handler);
@@ -74,6 +81,9 @@ function tmdbProxy(): Plugin {
 
 export default defineConfig({
   vite: { plugins: [tmdbProxy()] },
+  // Build target: Vercel when building on Vercel (VERCEL=1 is set there),
+  // otherwise the default (Cloudflare module) stays untouched.
+  nitro: process.env.VERCEL ? { preset: "vercel" } : {},
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

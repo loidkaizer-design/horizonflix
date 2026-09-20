@@ -605,3 +605,34 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Deploying to Vercel
+
+The app proxies TMDB through its own server (`/api/tmdb/**`) so the API token
+never ships to the browser. Two implementations exist and are picked automatically:
+
+- **Dev / preview** (`vite dev`, `vite preview`): the `tmdbProxy` Vite middleware in `vite.config.ts`.
+- **Production build** (`vite build`): the same logic is bundled into the SSR server entry
+  (`src/server.ts` → `src/lib/tmdb-proxy.server.ts`), so it runs on any target —
+  Vercel (nitro `vercel` preset is selected automatically when `VERCEL=1`),
+  Cloudflare, or Node.
+
+### Required environment variables (Vercel → Project → Settings → Environment Variables)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `TMDB_API_TOKEN` | ✅ | TMDB v3 API key (32-char hex) or v4 Bearer JWT (`eyJ…`) |
+| `TMDB_API_TOKEN_FALLBACK` | optional | Backup token, tried automatically on 401/403 |
+
+### Steps
+
+1. Import the repo into Vercel (framework preset: **Vite**).
+2. Add `TMDB_API_TOKEN` under Settings → Environment Variables.
+3. Build command `vite build` (default) — when building on Vercel, `VERCEL=1`
+   makes nitro emit the `vercel` output automatically. No extra config needed.
+4. Deploy, then verify `https://<your-app>.vercel.app/api/tmdb/trending/movie/week`
+   returns JSON.
+
+> Note: `.env` is for local development only and is **not** deployed. Vercel
+> reads `process.env.TMDB_API_TOKEN` at runtime from the dashboard settings.
+
