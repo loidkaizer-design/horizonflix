@@ -52,7 +52,7 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
   throw lastError instanceof Error ? lastError : new Error("TMDB is temporarily unavailable");
 }
 
-const pages = async (path: string, params: Record<string, string> = {}, count = 3) =>
+const pages = async (path: string, params: Record<string, string> = {}, count = 1) =>
   dedupe(
     (
       await Promise.allSettled(
@@ -68,7 +68,7 @@ const pages = async (path: string, params: Record<string, string> = {}, count = 
       .flatMap((result) => result.value.results ?? []),
   );
 
-export const getTrending = () => pages("/trending/movie/week", {}, 3);
+export const getTrending = () => pages("/trending/movie/week");
 export const getPopular = () => pages("/movie/popular", {}, 3);
 export const getLatest = () =>
   pages(
